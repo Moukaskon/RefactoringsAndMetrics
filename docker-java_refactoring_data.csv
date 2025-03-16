@@ -1,0 +1,5 @@
+projectName,SHA,CommitNumber,fileName,RefactoringType
+docker-java,88b06be36a7384e245a19aae557220dba5fb8d6b,UNKNOWN,src/test/java/com/kpelykh/docker/client/test/DockerClientAuthTest.java,EXTRACT_SUPERCLASS
+docker-java,88b06be36a7384e245a19aae557220dba5fb8d6b,UNKNOWN,src/test/java/com/kpelykh/docker/client/test/DockerPushTest.java,EXTRACT_SUPERCLASS
+docker-java,88b06be36a7384e245a19aae557220dba5fb8d6b,UNKNOWN,src/test/java/com/kpelykh/docker/client/test/DockerClientTest.java,EXTRACT_SUPERCLASS
+docker-java,3fda34cca7281442e7ddf176df678cfd3bdd5883,UNKNOWN,src/main/java/com/kpelykh/docker/client/model/CommitConfig.java,EXTRACT_INTERFACE

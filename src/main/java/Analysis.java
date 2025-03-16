@@ -12,7 +12,7 @@ public class Analysis {
         javaFiles = new ArrayList<>();
     }
 
-    public void StartAnalysis(){
+    public void startAnalysis(){
         ArrayList<String> rootFolders = getRootFolders(projectPath);
         getJavaFiles(projectPath);
         System.out.println("number of files: " + javaFiles.size());

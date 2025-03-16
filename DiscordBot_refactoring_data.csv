@@ -1,0 +1,7 @@
+projectName,SHA,CommitNumber,fileName,RefactoringType
+DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,UNKNOWN,src/main/java/novaz/main/NovaBot.java,EXTRACT_CLASS
+DiscordBot,e0f4db91b02e4cdc11f0608c3c3a3913af088b48,UNKNOWN,src/main/java/novaz/games/TicTacToe.java,EXTRACT_SUPERCLASS
+DiscordBot,b5801b51b80c2cd55a16216ad28c619394474010,UNKNOWN,src/main/java/novaz/db/model/OUser.java,EXTRACT_SUPERCLASS
+DiscordBot,b5801b51b80c2cd55a16216ad28c619394474010,UNKNOWN,src/main/java/novaz/db/model/OPoEToken.java,EXTRACT_SUPERCLASS
+DiscordBot,b5801b51b80c2cd55a16216ad28c619394474010,UNKNOWN,src/main/java/novaz/db/model/OServer.java,EXTRACT_SUPERCLASS
+DiscordBot,b5801b51b80c2cd55a16216ad28c619394474010,UNKNOWN,src/main/java/novaz/db/model/OMusic.java,EXTRACT_SUPERCLASS
