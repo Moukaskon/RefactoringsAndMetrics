@@ -1,0 +1,2 @@
+projectName,SHA,CommitNumber,fileName,RefactoringType
+Vortex,18b86e3df56395298735c2be7b2875f9c3812245,UNKNOWN,src/main/java/com/jagrosh/vortex/automod/Filter.java,EXTRACT_CLASS

@@ -29,8 +29,20 @@ public class Main {
 		//projects.add("https://github.com/teomaik/DeRec-GEA.git");
 		//projects.add("https://github.com/jagrosh/MusicBot");
 		//projects.add("https://github.com/docker-java/docker-java");
-		projects.add("https://github.com/Kaaz/DiscordBot");
-		
+		//projects.add("https://github.com/Kaaz/DiscordBot");
+		//projects.add("https://github.com/DiscordSRV/DiscordSRV");
+		//projects.add("https://github.com/jagrosh/Vortex");
+		//projects.add("https://github.com/Anuken/CoreBot");
+		//projects.add("https://github.com/DenizenScript/dDiscordBot");
+		//projects.add("https://github.com/wolfiabot/Wolfia");
+		//projects.add("https://github.com/teomaik/SeriousGame_home_defence");
+		//projects.add("https://github.com/Moukaskon/TestRefactorings");
+		//projects.add("https://github.com/Moukaskon/TestingRefPerson");
+		projects.add("https://github.com/Moukaskon/Orders");
+		//projects.add("https://github.com/Moukaskon/OrdersLast");
+		//projects.add("https://github.com/Moukaskon/OneMoreJava2");
+		//projects.add("https://github.com/Moukaskon/OredersAgain");
+
 		System.out.println("Number of Command Line Argument = " + args.length);
 		for (int i = 0; i < args.length; i++) {
 			System.out.println(String.format("Command Line Argument %d is %s", i, args[i]));
@@ -64,7 +76,7 @@ public class Main {
 //            throw new RuntimeException(e);
 //        }
 
-System.out.println("Maybe here?");
+
 	}
 
 
@@ -76,7 +88,6 @@ System.out.println("Maybe here?");
 			Git git = Git.open(new File(pathDirPrj));
 			branch = git.getRepository().getBranch();
 			git.close(); // Close the Git repository
-			//System.out.println("All good!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -153,11 +164,19 @@ System.out.println("Maybe here?");
 			System.out.println("afterGit.open()");
 			commitIds = Utils.getCommitIds(git);
 			System.out.println("Just before miner");
-			System.out.println(projectPath);
+			Set<String> processedCommits = new HashSet<>();
+
 			miner.detectAll(repo, null, new RefactoringHandler() {
 				@Override
 				public void handle(String commitId, List<Refactoring> refactorings) {
 					System.out.println("In miner");
+
+					if (processedCommits.contains(commitId)) {
+						System.out.println("\n\n\n----------------------------------------------------\n\n\n");
+						return;
+					}
+					System.out.println(processedCommits);
+					processedCommits.add(commitId);
 					List<String> refactoringTypes = new ArrayList<>();
 					List<String> involvedFilesBeforeRefactoring = new ArrayList<>();
 					if (!refactorings.isEmpty()) {
@@ -166,7 +185,13 @@ System.out.println("Maybe here?");
 							if (!refactoringTypesToKeep.contains(ref.getRefactoringType().toString())) {
 								continue;
 							}
-
+							if (ref.getRefactoringType().toString().equals("EXTRACT_CLASS")) {
+								System.out.println("Extracted Class(es):");
+				
+								for (var classPair : ref.getInvolvedClassesAfterRefactoring()) {
+									System.out.println("  - " + classPair.left);
+								}
+							}
 							refactoringTypes.add(ref.getRefactoringType().toString());
 							System.out.println(ref.getRefactoringType().toString());
 							System.out.println(ref.getInvolvedClassesBeforeRefactoring());
@@ -226,5 +251,4 @@ System.out.println("Maybe here?");
 			throw new RuntimeException(e);
 		}
 	}
-
 }

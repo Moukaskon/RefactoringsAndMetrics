@@ -1,0 +1,4 @@
+projectName,SHA,CommitNumber,fileName,RefactoringType
+Orders,cd7cfb85c3bacfa2803dd1ad7be73e92d57b2cd3,UNKNOWN,src/Order.java,EXTRACT_CLASS
+Orders,2316d93da8f2f78f65378951b354e7cf9d460f55,UNKNOWN,src/Order.java,EXTRACT_CLASS
+Orders,2316d93da8f2f78f65378951b354e7cf9d460f55,UNKNOWN,src/Order.java,EXTRACT_CLASS

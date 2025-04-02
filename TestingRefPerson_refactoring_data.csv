@@ -1,0 +1,2 @@
+projectName,SHA,CommitNumber,fileName,RefactoringType
+TestingRefPerson,88d5325fb65eb574d2e3d89b22f2b18d2802d358,UNKNOWN,src/Person.java,EXTRACT_CLASS

@@ -1,0 +1,2 @@
+projectName,SHA,CommitNumber,fileName,RefactoringType
+CoreBot,4d15c50438f7b74e644a08445ac8e40e51efcb32,UNKNOWN,src/corebot/Messages.java,EXTRACT_CLASS
