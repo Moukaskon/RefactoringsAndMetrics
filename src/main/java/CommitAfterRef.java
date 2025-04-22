@@ -1,16 +1,16 @@
 import java.util.List;
 
-public class CommitBeforeRef {
+public class CommitAfterRef {
     String refactoringCommit;
-    String commitBeforeRefactoring;
+    String commitAfterRefactoring;
     List<String> refactoringTypes;
-    List<List<String>> involvedFilesBeforeRefactoring;
+    List<List<String>> involvedFilesAfterRefactoring;
     Analysis analysis;
 
-    public CommitBeforeRef(String refactoringCommit, List<String> refactoringTypes, List<List<String>> involvedFilesBeforeRefactoring) {
+    public CommitAfterRef(String refactoringCommit, List<String> refactoringTypes, List<List<String>> involvedFilesAfterRefactoring) {
         this.refactoringCommit = refactoringCommit;
         this.refactoringTypes = refactoringTypes;
-        this.involvedFilesBeforeRefactoring = involvedFilesBeforeRefactoring;
+        this.involvedFilesAfterRefactoring = involvedFilesAfterRefactoring;
     }
 
     public void destroyMe() {
@@ -25,12 +25,12 @@ public class CommitBeforeRef {
         this.refactoringCommit = refactoringCommit;
     }
 
-    public String getCommitBeforeRefactoring() {
-        return commitBeforeRefactoring;
+    public String getCommitAfterRefactoring() {
+        return commitAfterRefactoring;
     }
 
-    public void setCommitBeforeRefactoring(String commitBeforeRefactoring) {
-        this.commitBeforeRefactoring = commitBeforeRefactoring;
+    public void setCommitAfterRefactoring(String commitAfterRefactoring) {
+        this.commitAfterRefactoring = commitAfterRefactoring;
     }
 
     public List<String> getRefactoringTypes() {
@@ -41,12 +41,12 @@ public class CommitBeforeRef {
         this.refactoringTypes = refactoringTypes;
     }
 
-    public List<List<String>> getInvolvedFilesBeforeRefactoring() {
-        return involvedFilesBeforeRefactoring;
+    public List<List<String>> getInvolvedFilesAfterRefactoring() {
+        return involvedFilesAfterRefactoring;
     }
 
-    public void setInvolvedFilesBeforeRefactoring(List<List<String>> involvedFilesBeforeRefactoring) {
-        this.involvedFilesBeforeRefactoring = involvedFilesBeforeRefactoring;
+    public void setInvolvedFilesAfterRefactoring(List<List<String>> involvedFilesAfterRefactoring) {
+        this.involvedFilesAfterRefactoring = involvedFilesAfterRefactoring;
     }
 
     public Analysis getAnalysis() {
@@ -61,9 +61,9 @@ public class CommitBeforeRef {
     public String toString() {
         return "CommitBeforeRef{" +
                 "refactoringCommit='" + refactoringCommit + '\'' +
-                ", commitBeforeRefactoring='" + commitBeforeRefactoring + '\'' +
+                ", commitBeforeRefactoring='" + commitAfterRefactoring + '\'' +
                 ", refactoringTypes=" + refactoringTypes +
-                ", involvedFilesBeforeRefactoring=" + involvedFilesBeforeRefactoring +
+                ", involvedFilesBeforeRefactoring=" + involvedFilesAfterRefactoring +
                 '}';
     }
 }
