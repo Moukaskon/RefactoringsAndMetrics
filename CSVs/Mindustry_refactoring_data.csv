@@ -1,0 +1,2 @@
+projectName,SHA,Files Before ref,RefactoringType,files After
+Mindustry,22538840a1caede1016823b12972e6196053bf0b,"core/src/mindustry/world/blocks/storage/CoreBlock.java",EXTRACT_INTERFACE,"core/src/mindustry/world/blocks/storage/CoreBlock.java; core/src/mindustry/world/blocks/LaunchAnimator.java"

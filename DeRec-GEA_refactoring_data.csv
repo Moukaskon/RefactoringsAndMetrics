@@ -1,2 +1,0 @@
-projectName,SHA,fileName,RefactoringType,files After
-DeRec-GEA,1f3c9de09100b8192958bc3688edf129e1bc870d,[src/main/java/geneticEvolutionaryAlgorithm/GEA.java],EXTRACT_CLASS,[src/main/java/geneticEvolutionaryAlgorithm/GEA.java, src/main/java/geneticEvolutionaryAlgorithm/GEA_Task.java]

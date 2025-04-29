@@ -4,11 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.jgit.api.Git;
@@ -26,9 +22,28 @@ public class Main {
 		// Get url and name
 		ArrayList<String> csvs = new ArrayList<>();
 		ArrayList<String> projects = new ArrayList<>();
-		//projects.add("https://github.com/Moukaskon/Orders");
 		//projects.add("https://github.com/teomaik/DeRec-GEA.git");
-		projects.add("https://github.com/jagrosh/MusicBot");
+		//projects.add("https://github.com/jagrosh/MusicBot");
+		//projects.add("https://github.com/apache/maven-archetype");
+		//projects.add("https://github.com/apache/commons-io");
+		//projects.add("https://github.com/apache/commons-lang");
+		//projects.add("https://github.com/apache/griffin");
+		// projects.add("https://github.com/apache/johnzon");
+		// projects.add("https://github.com/apache/openwebbeans");
+		// projects.add("https://github.com/apache/unomi");
+		// projects.add("https://github.com/apache/logging-flume");
+		// projects.add("https://github.com/apache/commons-rdf");
+		// projects.add("https://github.com/apache/giraph");
+		//projects.add("https://github.com/docker-java/docker-java");
+		//projects.add("https://github.com/Kaaz/DiscordBot");
+		//projects.add("https://github.com/DiscordSRV/DiscordSRV");
+		//projects.add("https://github.com/jagrosh/Vortex");
+		//projects.add("https://github.com/Anuken/CoreBot");
+		//projects.add("https://github.com/DenizenScript/dDiscordBot");
+		//projects.add("https://github.com/wolfiabot/Wolfia");
+		//projects.add("https://github.com/elastic/elasticsearch"); //Big one 86.000 comits
+		projects.add("https://github.com/Anuken/Mindustry"); // Game, big one
+
 		
 		
 		System.out.println("Number of Command Line Argument = " + args.length);
@@ -67,7 +82,7 @@ public class Main {
 	public static String runAnalysis(String gitURL) {
 		// Get url and name
 		gitURL = gitURL.replace(".git", "");
-		String projectName = gitURL.split("/")[gitURL.split("/").length - 1];
+		String projectName = "Allprojects"+ File.separator + gitURL.split("/")[gitURL.split("/").length - 1];
 		String projectPath = System.getProperty("user.dir") + File.separator + projectName;
 		String errorMesg = "";
 
@@ -326,7 +341,7 @@ public class Main {
 	}
 
     private static void csvWriting(List<CommitBeforeRef> commitBeforeRefs, List<CommitAfterRef> commitAfterRefs, String projectName) {
-        String filePath = projectName + "_refactoring_data.csv";
+        String filePath = "CSVs" + File.separator + projectName.replace("Allprojects" + File.separator, "") + "_refactoring_data.csv";
 
 		try (FileWriter writer = new FileWriter(filePath)) {
 			writer.write("projectName,SHA,Files Before ref,RefactoringType,files After\n");
@@ -356,7 +371,7 @@ public class Main {
 					String beforeJoined = String.join("; ", beforeFiles);
 					String afterJoined = String.join("; ", afterFiles);
 				
-					writer.write(String.format("%s,%s,\"%s\",%s,\"%s\"%n", projectName, sha, beforeJoined, ref, afterJoined));
+					writer.write(String.format("%s,%s,\"%s\",%s,\"%s\"%n", projectName.replace("Allprojects" + File.separator, ""), sha, beforeJoined, ref, afterJoined));
 				}
 
 

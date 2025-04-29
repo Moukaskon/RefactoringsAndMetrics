@@ -1,0 +1,2 @@
+projectName,SHA,Files Before ref,RefactoringType,files After
+Vortex,18b86e3df56395298735c2be7b2875f9c3812245,"src/main/java/com/jagrosh/vortex/automod/Filter.java",EXTRACT_CLASS,"src/main/java/com/jagrosh/vortex/automod/Filter.java; src/main/java/com/jagrosh/vortex/automod/Filter.java"

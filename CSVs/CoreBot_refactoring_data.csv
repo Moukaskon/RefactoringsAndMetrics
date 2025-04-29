@@ -1,0 +1,2 @@
+projectName,SHA,Files Before ref,RefactoringType,files After
+CoreBot,4d15c50438f7b74e644a08445ac8e40e51efcb32,"src/corebot/Messages.java",EXTRACT_CLASS,"src/corebot/Messages.java; src/corebot/Messages.java"
