@@ -22,18 +22,18 @@ public class Main {
 		// Get url and name
 		ArrayList<String> csvs = new ArrayList<>();
 		ArrayList<String> projects = new ArrayList<>();
-		//projects.add("https://github.com/teomaik/DeRec-GEA.git");
+		projects.add("https://github.com/teomaik/DeRec-GEA.git");
 		//projects.add("https://github.com/jagrosh/MusicBot");
 		//projects.add("https://github.com/apache/maven-archetype");
 		//projects.add("https://github.com/apache/commons-io");
 		//projects.add("https://github.com/apache/commons-lang");
 		//projects.add("https://github.com/apache/griffin");
-		// projects.add("https://github.com/apache/johnzon");
-		// projects.add("https://github.com/apache/openwebbeans");
-		// projects.add("https://github.com/apache/unomi");
-		// projects.add("https://github.com/apache/logging-flume");
-		// projects.add("https://github.com/apache/commons-rdf");
-		// projects.add("https://github.com/apache/giraph");
+		//projects.add("https://github.com/apache/johnzon");
+		//projects.add("https://github.com/apache/openwebbeans");
+		//projects.add("https://github.com/apache/unomi");
+		//projects.add("https://github.com/apache/logging-flume");
+		//projects.add("https://github.com/apache/commons-rdf");
+		//projects.add("https://github.com/apache/giraph");
 		//projects.add("https://github.com/docker-java/docker-java");
 		//projects.add("https://github.com/Kaaz/DiscordBot");
 		//projects.add("https://github.com/DiscordSRV/DiscordSRV");
@@ -41,14 +41,14 @@ public class Main {
 		//projects.add("https://github.com/Anuken/CoreBot");
 		//projects.add("https://github.com/DenizenScript/dDiscordBot");
 		//projects.add("https://github.com/wolfiabot/Wolfia");
-		//projects.add("https://github.com/elastic/elasticsearch"); //Big one 86.000 comits
-		projects.add("https://github.com/Anuken/Mindustry"); // Game, big one
-
+		//projects.add("https://github.com/spring-projects/spring-framework");
+		//projects.add("https://github.com/bumptech/glide");
+		//projects.add("https://github.com/apache/dubbo");
 		
 		
 		System.out.println("Number of Command Line Argument = " + args.length);
 		for (int i = 0; i < args.length; i++) {
-			System.out.println(String.format("Command Line Argument %d is %s", i, args[i]));
+			System.out.println("Command Line Argument" + i + "is" + args[i]);
 			projects.add(args[i]);
 		}
 
@@ -67,7 +67,7 @@ public class Main {
 //        //create csv file
 //        try {
 //            FileWriter writer = new FileWriter(new File(System.getProperty("user.dir")+"/data_projects.csv"));
-////            writer.write("projectName,SHA,file,rank,DSC,WMC,DIT,CC,LCOM,MPC,NOM,RFC,DAC,NOCC,CBO,SIZE1,SIZE2,REFACTORED" + System.lineSeparator());
+//            writer.write("projectName,SHA,file,rank,DSC,WMC,DIT,CC,LCOM,MPC,NOM,RFC,DAC,NOCC,CBO,SIZE1,SIZE2,REFACTORED" + System.lineSeparator());
 //
 //            String listString = String.join("\n ", csvs);
 //            writer.write(listString);
@@ -95,9 +95,9 @@ public class Main {
 		GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
 
 		System.out.println("after git,miner()");
-		ArrayList<String> refactoringTypesToKeep = new ArrayList<>(Arrays.asList("EXTRACT_METHOD","MOVE_METHOD",
-		"PULL_UP_METHOD","EXTRACT_SUPERCLASS", "EXTRACT_INTERFACE", "EXTRACT_AND_MOVE_METHOD", "EXTRACT_CLASS",
-		"MOVE_AND_RENAME_METHOD", "SPLIT_CLASS"));
+		ArrayList<String> refactoringTypesToKeep = new ArrayList<>(Arrays.asList("PULL_UP_METHOD","EXTRACT_SUPERCLASS",
+		"EXTRACT_INTERFACE", "EXTRACT_AND_MOVE_METHOD", "EXTRACT_CLASS","MOVE_AND_RENAME_METHOD",
+		 "SPLIT_CLASS", "EXTRACT_OPERATION", "MOVE_OPERATION"));
 
 		List<CommitObj> commitIds = new ArrayList<CommitObj>();
 		try {
@@ -113,11 +113,19 @@ public class Main {
 				public void handle(String commitId, List<Refactoring> refactorings) {
 					if (!refactorings.isEmpty()) {
 						// Create CommitBeforeRef
+
 						List<String> refactoringTypes = new ArrayList<>();
 						List<List<String>> involvedFilesBeforeRefactoring = new ArrayList<>();
 						List<List<String>> involvedFilesAfterRefactoring = new ArrayList<>();
 						
 						for (Refactoring ref : refactorings) {
+							// System.out.println("\n\n" + ref.getRefactoringType().toString() + "\n\n\n");
+							// try (BufferedWriter writer = new BufferedWriter(new FileWriter("refactorings_output3.txt", true))) {
+							// 	writer.write(ref.getRefactoringType().toString() + "\n");
+							// 	writer.write("-----\n"); // separator between commits
+							// } catch (IOException e) {
+							// 	e.printStackTrace();
+							// }
 							if (!refactoringTypesToKeep.contains(ref.getRefactoringType().toString())) {
 								continue;
 							}
@@ -128,6 +136,7 @@ public class Main {
 							refactoringTypes.add(ref.getRefactoringType().toString());
 							involvedFilesBeforeRefactoring.add(new ArrayList<>());
 							involvedFilesAfterRefactoring.add(new ArrayList<>());
+
 							for (ImmutablePair<String, String> immutablePair : ref.getInvolvedClassesBeforeRefactoring()) {
 								System.out.println(immutablePair + "1st\n\n\n");
 								hadRef = true;
@@ -158,7 +167,6 @@ public class Main {
 						}
 					}
 					//System.out.println("\n\n\n End miner \n\n\n");
-
 				}
 			});
 		} catch (Exception e) {
@@ -177,10 +185,9 @@ public class Main {
 				//partedAnalysis(projectName, projectPath, commitBeforeRefs, commit, commitStep, commitIds);
 				System.out.println("Finished parted analysis for: "+projectName);
 			}catch(Exception e) {
-				finalErrors+="\n"+e.getMessage();	
+				finalErrors += "\n" + e.getMessage();	
 			}
 		}
-		
 		return finalErrors;
 	}
 

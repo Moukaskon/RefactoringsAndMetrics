@@ -1,9 +1,121 @@
 projectName,SHA,Files Before ref,RefactoringType,files After
-DiscordBot,518f52ae03a83b0846b0ed822b87c70703a92123,"src/main/java/emily/guildsettings/AbstractGuildSetting.java",EXTRACT_CLASS,"src/main/java/emily/guildsettings/AbstractGuildSetting.java; src/main/java/emily/guildsettings/GSetting.java"
-DiscordBot,9f54ee5c66cf2d8089d203b7ea325a5a0dacf370,"src/main/java/discordbot/handler/ChatBotHandler.java",EXTRACT_CLASS,"src/main/java/discordbot/handler/ChatBotHandler.java; src/main/java/discordbot/handler/ChatBotHandler.java"
-DiscordBot,af0b4108405c174cc0ce31ba87da86975700250a,"src/main/java/discordbot/command/administrative/KickCommand.java",EXTRACT_SUPERCLASS,"src/main/java/discordbot/command/administrative/KickCommand.java; src/main/java/discordbot/command/administrative/modactions/AbstractModActionCommand.java"
-DiscordBot,a8fafd1f31e4f978942c85fba827dbcaeb2eeb74,"src/main/java/discordbot/command/music/NowPlayingCommand.java",EXTRACT_CLASS,"src/main/java/discordbot/command/music/NowPlayingCommand.java; src/main/java/discordbot/util/MusicUtil.java"
-DiscordBot,b3af57ac653645a864a9c790cc1fc38b08f57a58,"src/main/java/novaz/util/Misc.java",EXTRACT_CLASS,"src/main/java/novaz/util/Misc.java; src/main/java/novaz/util/DisUtil.java"
-DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,"src/main/java/novaz/main/NovaBot.java",EXTRACT_CLASS,"src/main/java/novaz/main/NovaBot.java; src/main/java/novaz/handler/OutgoingContentHandler.java"
-DiscordBot,e0f4db91b02e4cdc11f0608c3c3a3913af088b48,"src/main/java/novaz/games/TicTacToe.java",EXTRACT_SUPERCLASS,"src/main/java/novaz/games/TicTacToe.java; src/main/java/novaz/games/AbstractGame.java"
-DiscordBot,b5801b51b80c2cd55a16216ad28c619394474010,"src/main/java/novaz/db/model/OMusic.java; src/main/java/novaz/db/model/OPoEToken.java; src/main/java/novaz/db/model/OServer.java; src/main/java/novaz/db/model/OUser.java",EXTRACT_SUPERCLASS,"src/main/java/novaz/db/model/OMusic.java; src/main/java/novaz/db/model/OPoEToken.java; src/main/java/novaz/db/model/OServer.java; src/main/java/novaz/db/model/OUser.java; src/main/java/novaz/db/AbstractModel.java"
+DiscordBot,122df47cb7f9c87476cab4d6f8eb85ee38e4920c,src/main/java/emily/main/Launcher.java,EXTRACT_OPERATION,src/main/java/emily/main/Launcher.java
+DiscordBot,845be4ac7ce4d024e9bd4e1721a3f040e67c5ebf,src/main/java/emily/command/administrative/ReactionRoleCommand.java,EXTRACT_OPERATION,src/main/java/emily/command/administrative/ReactionRoleCommand.java
+DiscordBot,5fcd1efa8834c73cc598694ed99cd4e0e4104164,src/main/java/emily/main/DiscordBot.java,EXTRACT_OPERATION,src/main/java/emily/main/DiscordBot.java
+DiscordBot,5fcd1efa8834c73cc598694ed99cd4e0e4104164,src/main/java/emily/main/DiscordBot.java,EXTRACT_OPERATION,src/main/java/emily/main/DiscordBot.java
+DiscordBot,518f52ae03a83b0846b0ed822b87c70703a92123,src/main/java/emily/guildsettings/AbstractGuildSetting.java,EXTRACT_CLASS,src/main/java/emily/guildsettings/AbstractGuildSetting.java; src/main/java/emily/guildsettings/GSetting.java
+DiscordBot,518f52ae03a83b0846b0ed822b87c70703a92123,src/main/java/emily/guildsettings/AbstractGuildSetting.java,MOVE_OPERATION,src/main/java/emily/guildsettings/GSetting.java
+DiscordBot,518f52ae03a83b0846b0ed822b87c70703a92123,src/main/java/emily/guildsettings/AbstractGuildSetting.java,MOVE_OPERATION,src/main/java/emily/guildsettings/GSetting.java
+DiscordBot,518f52ae03a83b0846b0ed822b87c70703a92123,src/main/java/emily/guildsettings/AbstractGuildSetting.java,MOVE_OPERATION,src/main/java/emily/guildsettings/GSetting.java
+DiscordBot,518f52ae03a83b0846b0ed822b87c70703a92123,src/main/java/emily/guildsettings/AbstractGuildSetting.java,MOVE_OPERATION,src/main/java/emily/guildsettings/GSetting.java
+DiscordBot,4a1bfa780c1cee31611ffef895a226fc18df5838,src/main/java/emily/templates/TemplateCache.java,EXTRACT_OPERATION,src/main/java/emily/templates/TemplateCache.java
+DiscordBot,4a1bfa780c1cee31611ffef895a226fc18df5838,src/main/java/emily/templates/TemplateCache.java,EXTRACT_OPERATION,src/main/java/emily/templates/TemplateCache.java
+DiscordBot,14e278178c5609736ef114bfc209e81246aa4e10,src/main/java/discordbot/util/Misc.java,EXTRACT_OPERATION,src/main/java/discordbot/util/Misc.java
+DiscordBot,94671b57b09a82d912a766a76ac31f1b73d96713,src/main/java/discordbot/handler/Template.java,MOVE_OPERATION,src/main/java/discordbot/templates/TemplateCache.java
+DiscordBot,94671b57b09a82d912a766a76ac31f1b73d96713,src/main/java/discordbot/handler/Template.java,MOVE_OPERATION,src/main/java/discordbot/templates/TemplateCache.java
+DiscordBot,94671b57b09a82d912a766a76ac31f1b73d96713,src/main/java/discordbot/handler/Template.java,MOVE_OPERATION,src/main/java/discordbot/templates/TemplateCache.java
+DiscordBot,94671b57b09a82d912a766a76ac31f1b73d96713,src/main/java/discordbot/handler/Template.java,MOVE_OPERATION,src/main/java/discordbot/templates/TemplateCache.java
+DiscordBot,8d6b808a68b2b1ea7aebc346f8784d278e053240,src/main/java/discordbot/templates/Template.java,EXTRACT_OPERATION,src/main/java/discordbot/templates/Template.java
+DiscordBot,68ef276e8db7d582a7b12a314796a514689c89d8,src/main/java/discordbot/command/music/PlaylistCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/command/music/PlaylistCommand.java
+DiscordBot,83968cabb0d52f9fd14356b41d4c520c84c8aa47,src/main/java/discordbot/command/creator/DebugCommand.java,MOVE_OPERATION,src/main/java/discordbot/command/administrative/GuildStatsCommand.java
+DiscordBot,16d514309e1e671abdcb473a19047db28b7ab000,src/main/java/discordbot/db/controllers/CGuild.java,EXTRACT_OPERATION,src/main/java/discordbot/db/controllers/CGuild.java
+DiscordBot,16d514309e1e671abdcb473a19047db28b7ab000,src/main/java/discordbot/handler/GuildSettings.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/GuildSettings.java
+DiscordBot,68a516126034e21738bc0c4566f51850b5da36b2,src/main/java/discordbot/db/controllers/CTag.java,EXTRACT_OPERATION,src/main/java/discordbot/db/controllers/CTag.java
+DiscordBot,023c9d9a011276f16f357798ab81e95d793fe09e,src/main/java/discordbot/games/game2048/Grid.java,EXTRACT_OPERATION,src/main/java/discordbot/games/game2048/Grid.java
+DiscordBot,29824d7c5c86276c951211ea9b14d752198f0677,src/main/java/discordbot/command/informative/ServerCommand.java,MOVE_OPERATION,src/main/java/discordbot/util/GfxUtil.java
+DiscordBot,9f54ee5c66cf2d8089d203b7ea325a5a0dacf370,src/main/java/discordbot/handler/ChatBotHandler.java,EXTRACT_CLASS,src/main/java/discordbot/handler/ChatBotHandler.java; src/main/java/discordbot/handler/ChatBotHandler.java
+DiscordBot,9f54ee5c66cf2d8089d203b7ea325a5a0dacf370,src/main/java/discordbot/handler/ChatBotHandler.java,MOVE_OPERATION,src/main/java/discordbot/handler/ChatBotHandler.java
+DiscordBot,48b74177df0bd611c5ba27ba7b6686bc2f9811ad,src/main/java/discordbot/command/fun/FMLCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/command/fun/FMLCommand.java
+DiscordBot,6ad2837b5d8ac2e7132b544109d7dddbbc2d1716,src/main/java/discordbot/main/DiscordBot.java,EXTRACT_OPERATION,src/main/java/discordbot/main/DiscordBot.java
+DiscordBot,492e295724640b8e122aeb7fa2929edfda97525f,src/main/java/discordbot/handler/OutgoingContentHandler.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/OutgoingContentHandler.java
+DiscordBot,f9c27ddf9c3bbc2b64b800bea285b43dafbd207d,src/main/java/discordbot/command/informative/HelpCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/command/informative/HelpCommand.java
+DiscordBot,f9c27ddf9c3bbc2b64b800bea285b43dafbd207d,src/main/java/discordbot/command/informative/HelpCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/command/informative/HelpCommand.java
+DiscordBot,f9c27ddf9c3bbc2b64b800bea285b43dafbd207d,src/main/java/discordbot/guildsettings/DefaultGuildSettings.java,EXTRACT_OPERATION,src/main/java/discordbot/guildsettings/DefaultGuildSettings.java
+DiscordBot,f851fe06820238a32f415d447589143f2f7d26c1,src/main/java/discordbot/command/administrative/SetConfig.java,EXTRACT_OPERATION,src/main/java/discordbot/command/administrative/SetConfig.java
+DiscordBot,a40b0c3faa722da753a0f49522ac52df088467f6,src/main/java/discordbot/service/BotStatusService.java,EXTRACT_OPERATION,src/main/java/discordbot/service/BotStatusService.java
+DiscordBot,a40b0c3faa722da753a0f49522ac52df088467f6,src/main/java/discordbot/service/BotStatusService.java,EXTRACT_OPERATION,src/main/java/discordbot/service/BotStatusService.java
+DiscordBot,55a7454dba092c958aa239220adade2f44837d04,src/main/java/discordbot/db/controllers/CPlaylist.java,EXTRACT_OPERATION,src/main/java/discordbot/db/controllers/CPlaylist.java
+DiscordBot,af0b4108405c174cc0ce31ba87da86975700250a,src/main/java/discordbot/command/administrative/KickCommand.java,EXTRACT_SUPERCLASS,src/main/java/discordbot/command/administrative/KickCommand.java; src/main/java/discordbot/command/administrative/modactions/AbstractModActionCommand.java
+DiscordBot,7f38a8f6549d58720eac788641cc65ee50504a8e,src/main/java/discordbot/main/BotContainer.java,EXTRACT_OPERATION,src/main/java/discordbot/main/BotContainer.java
+DiscordBot,336bb23b16c6964fb40e5f10dd6bc051140c6e59,src/main/java/discordbot/handler/MusicPlayerHandler.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/MusicPlayerHandler.java
+DiscordBot,e4acc34457ed4862e6df71032d264f8e6a260ee7,src/main/java/discordbot/command/music/PlaylistCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/command/music/PlaylistCommand.java
+DiscordBot,e4acc34457ed4862e6df71032d264f8e6a260ee7,src/main/java/discordbot/command/music/PlaylistCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/command/music/PlaylistCommand.java
+DiscordBot,e4acc34457ed4862e6df71032d264f8e6a260ee7,src/main/java/discordbot/command/music/PlaylistCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/command/music/PlaylistCommand.java
+DiscordBot,c28f6b202f87776d5bd08a5ee4e4a0396482ddd7,src/main/java/discordbot/handler/GuildSettings.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/GuildSettings.java
+DiscordBot,c28f6b202f87776d5bd08a5ee4e4a0396482ddd7,src/main/java/discordbot/main/DiscordBot.java,EXTRACT_OPERATION,src/main/java/discordbot/main/DiscordBot.java
+DiscordBot,c28f6b202f87776d5bd08a5ee4e4a0396482ddd7,src/main/java/discordbot/util/DisUtil.java,EXTRACT_OPERATION,src/main/java/discordbot/util/DisUtil.java
+DiscordBot,b74bc88b385bfe3ddfc8850bd1bef0757bee4ad0,src/main/java/discordbot/handler/MusicReactionHandler.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/MusicReactionHandler.java
+DiscordBot,b74bc88b385bfe3ddfc8850bd1bef0757bee4ad0,src/main/java/discordbot/handler/MusicReactionHandler.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/MusicReactionHandler.java
+DiscordBot,a8fafd1f31e4f978942c85fba827dbcaeb2eeb74,src/main/java/discordbot/event/JDAEvents.java,EXTRACT_OPERATION,src/main/java/discordbot/event/JDAEvents.java
+DiscordBot,a8fafd1f31e4f978942c85fba827dbcaeb2eeb74,src/main/java/discordbot/command/music/NowPlayingCommand.java,EXTRACT_CLASS,src/main/java/discordbot/command/music/NowPlayingCommand.java; src/main/java/discordbot/util/MusicUtil.java
+DiscordBot,a8fafd1f31e4f978942c85fba827dbcaeb2eeb74,src/main/java/discordbot/command/music/NowPlayingCommand.java,MOVE_OPERATION,src/main/java/discordbot/util/MusicUtil.java
+DiscordBot,b95945451dfc6e414f90ce12f59962c87c3353be,src/main/java/discordbot/command/music/SkipTrack.java,MOVE_OPERATION,src/main/java/discordbot/handler/MusicPlayerHandler.java
+DiscordBot,636f9121f624a0ab234ea66fcdf6b25bf3278120,src/main/java/discordbot/db/controllers/CBlacklistCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/db/controllers/CBlacklistCommand.java
+DiscordBot,186460fd3acdc5712df1feaef5ed841811845732,src/main/java/discordbot/event/JDAEvents.java,MOVE_OPERATION,src/main/java/discordbot/event/JDAReadyEvent.java
+DiscordBot,6a2ecea992f98e408ba0d1f62076580455b793fc,src/main/java/discordbot/command/music/Play.java,EXTRACT_OPERATION,src/main/java/discordbot/command/music/Play.java
+DiscordBot,6338f345f035e4d90e7c0c2d473e6e5adc58fb0f,src/main/java/discordbot/db/controllers/CBotEvent.java,EXTRACT_OPERATION,src/main/java/discordbot/db/controllers/CBotEvent.java
+DiscordBot,534f2f0fc8fc0dbda9eef6d603feed86c8130d87,src/main/java/discordbot/util/DisUtil.java,EXTRACT_OPERATION,src/main/java/discordbot/util/DisUtil.java
+DiscordBot,2aec2036f3d23b7bf62dc11b3a8850e0d917984d,src/main/java/discordbot/role/RoleRankings.java,EXTRACT_OPERATION,src/main/java/discordbot/role/RoleRankings.java
+DiscordBot,cd03cf4bf979730f2777cd51d4b3b86c09c60425,src/main/java/discordbot/handler/CommandHandler.java,MOVE_OPERATION,src/main/java/discordbot/main/DiscordBot.java
+DiscordBot,ec26d0cc4ffce86724ce614e2d1ef3dbffc11816,src/main/java/discordbot/db/controllers/CUser.java,EXTRACT_OPERATION,src/main/java/discordbot/db/controllers/CUser.java
+DiscordBot,cc24cc9ad2a5c79919e2083eb6c1f262b3287cb6,src/main/java/discordbot/handler/Template.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/Template.java
+DiscordBot,cc24cc9ad2a5c79919e2083eb6c1f262b3287cb6,src/main/java/discordbot/handler/Template.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/Template.java
+DiscordBot,dfa7981458e6657a890568302bf62a228bb4023c,src/main/java/discordbot/command/administrative/GuildStatsCommand.java,EXTRACT_OPERATION,src/main/java/discordbot/command/administrative/GuildStatsCommand.java
+DiscordBot,700cd4c9f35a27c3f3b8228e47593a079325f072,src/main/java/discordbot/core/AbstractService.java,EXTRACT_OPERATION,src/main/java/discordbot/core/AbstractService.java
+DiscordBot,d35c4b82798168090439c3b531af255d4bc83976,src/main/java/discordbot/handler/MusicPlayerHandler.java,EXTRACT_OPERATION,src/main/java/discordbot/handler/MusicPlayerHandler.java
+DiscordBot,82e7b04400c25a0526942db529c71ba4e269a233,src/main/java/discordbot/db/table/TGuild.java,EXTRACT_OPERATION,src/main/java/discordbot/db/table/TGuild.java
+DiscordBot,82e7b04400c25a0526942db529c71ba4e269a233,src/main/java/discordbot/db/table/TUser.java,EXTRACT_OPERATION,src/main/java/discordbot/db/table/TUser.java
+DiscordBot,2da2a48e516e2cfdd306c79a57e9e1d85bf62154,src/main/java/discordbot/command/administrative/Subscribe.java,EXTRACT_OPERATION,src/main/java/discordbot/command/administrative/Subscribe.java
+DiscordBot,f44a38e8f05e46d81a36a0917602ece86f03718b,src/main/java/discordbot/db/table/TChannels.java,EXTRACT_OPERATION,src/main/java/discordbot/db/table/TChannels.java
+DiscordBot,cb6a706f41e84efdb00bab69a4486ab43ed049b0,src/main/java/discordbot/db/table/TTag.java,EXTRACT_OPERATION,src/main/java/discordbot/db/table/TTag.java
+DiscordBot,4a3b4cf7625728c404db9c32103a1dad4903dc36,src/main/java/discordbot/main/Launcher.java,EXTRACT_OPERATION,src/main/java/discordbot/main/Launcher.java
+DiscordBot,0a20db16343c3164e8ef25314728fb7d5b6ad736,src/main/java/discordbot/command/informative/ProfileCommand.java,MOVE_OPERATION,src/main/java/discordbot/util/GfxUtil.java
+DiscordBot,3fafc7d02794764cc9de221559d2c98ce3e6b9a8,src/main/java/discordbot/main/Launcher.java,EXTRACT_OPERATION,src/main/java/discordbot/main/Launcher.java
+DiscordBot,3fafc7d02794764cc9de221559d2c98ce3e6b9a8,src/main/java/discordbot/main/Launcher.java,EXTRACT_OPERATION,src/main/java/discordbot/main/Launcher.java
+DiscordBot,e03cc9c3553b18e9bfb49fc0213c3ba59a42b27e,src/main/java/discordbot/util/TimeUtil.java,EXTRACT_OPERATION,src/main/java/discordbot/util/TimeUtil.java
+DiscordBot,008874cec4f73fcd71ac9e2e778ddc8561968c8d,src/main/java/novaz/role/RoleRankings.java,EXTRACT_OPERATION,src/main/java/novaz/role/RoleRankings.java
+DiscordBot,008874cec4f73fcd71ac9e2e778ddc8561968c8d,src/main/java/novaz/role/RoleRankings.java,EXTRACT_OPERATION,src/main/java/novaz/role/RoleRankings.java
+DiscordBot,aad114ae21c9c56f3839bd08e233e6409c3a0344,src/main/java/novaz/role/RoleRankings.java,EXTRACT_OPERATION,src/main/java/novaz/role/RoleRankings.java
+DiscordBot,f6b710b8850083b4e71d924d79fbc9b91d570217,src/main/java/novaz/handler/CommandHandler.java,MOVE_OPERATION,src/main/java/novaz/util/DisUtil.java
+DiscordBot,f6b710b8850083b4e71d924d79fbc9b91d570217,src/main/java/novaz/handler/CommandHandler.java,MOVE_OPERATION,src/main/java/novaz/util/DisUtil.java
+DiscordBot,87ba4792546da9da51be1dae6ea1f0764f48575f,src/main/java/novaz/handler/CommandHandler.java,EXTRACT_OPERATION,src/main/java/novaz/handler/CommandHandler.java
+DiscordBot,b3af57ac653645a864a9c790cc1fc38b08f57a58,src/main/java/novaz/util/Misc.java,EXTRACT_CLASS,src/main/java/novaz/util/Misc.java; src/main/java/novaz/util/DisUtil.java
+DiscordBot,b3af57ac653645a864a9c790cc1fc38b08f57a58,src/main/java/novaz/util/Misc.java,MOVE_OPERATION,src/main/java/novaz/util/DisUtil.java
+DiscordBot,b3af57ac653645a864a9c790cc1fc38b08f57a58,src/main/java/novaz/util/Misc.java,MOVE_OPERATION,src/main/java/novaz/util/DisUtil.java
+DiscordBot,cca0ca9c3fd6c6749842a99659620a13da583eb0,src/main/java/novaz/command/music/Join.java,EXTRACT_OPERATION,src/main/java/novaz/command/music/Join.java
+DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,src/main/java/novaz/main/NovaBot.java,EXTRACT_CLASS,src/main/java/novaz/main/NovaBot.java; src/main/java/novaz/handler/OutgoingContentHandler.java
+DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,src/main/java/novaz/main/NovaBot.java,MOVE_OPERATION,src/main/java/novaz/handler/OutgoingContentHandler.java
+DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,src/main/java/novaz/main/NovaBot.java,MOVE_OPERATION,src/main/java/novaz/handler/OutgoingContentHandler.java
+DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,src/main/java/novaz/main/NovaBot.java,MOVE_OPERATION,src/main/java/novaz/handler/OutgoingContentHandler.java
+DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,src/main/java/novaz/main/NovaBot.java,MOVE_OPERATION,src/main/java/novaz/handler/OutgoingContentHandler.java
+DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,src/main/java/novaz/main/NovaBot.java,MOVE_OPERATION,src/main/java/novaz/handler/OutgoingContentHandler.java
+DiscordBot,e687e3e70201b6123f83f603bfc6933ef90339b9,src/main/java/novaz/main/NovaBot.java,MOVE_OPERATION,src/main/java/novaz/handler/OutgoingContentHandler.java
+DiscordBot,70d281f24ec89b9be86c68a46ce09bdb99e45a72,src/main/java/novaz/handler/GameHandler.java,EXTRACT_OPERATION,src/main/java/novaz/handler/GameHandler.java
+DiscordBot,b4951d2b3fa6c7948365f095625f97be9a8893a9,src/main/java/novaz/main/NovaBot.java,EXTRACT_OPERATION,src/main/java/novaz/main/NovaBot.java
+DiscordBot,e0f4db91b02e4cdc11f0608c3c3a3913af088b48,src/main/java/novaz/games/TicTacToe.java,EXTRACT_SUPERCLASS,src/main/java/novaz/games/TicTacToe.java; src/main/java/novaz/games/AbstractGame.java
+DiscordBot,b5801b51b80c2cd55a16216ad28c619394474010,src/main/java/novaz/db/model/OMusic.java; src/main/java/novaz/db/model/OPoEToken.java; src/main/java/novaz/db/model/OServer.java; src/main/java/novaz/db/model/OUser.java,EXTRACT_SUPERCLASS,src/main/java/novaz/db/model/OMusic.java; src/main/java/novaz/db/model/OPoEToken.java; src/main/java/novaz/db/model/OServer.java; src/main/java/novaz/db/model/OUser.java; src/main/java/novaz/db/AbstractModel.java
+DiscordBot,6d8d93f730a82b036831a49dcf7d3124f31d2832,src/main/java/novaz/modules/reddit/RedditScraper.java,MOVE_OPERATION,src/main/java/novaz/util/HttpHelper.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,ed9fc1d0e95911f1ee3c70abf9611197ae574680,src/main/java/novaz/modules/reddit/gson/Data.java,MOVE_OPERATION,src/main/java/novaz/modules/reddit/pojo/PostData.java
+DiscordBot,063a005d98528c2eb1ed8e5410bb834c65dfa205,src/main/java/novaz/main/NovaBot.java,EXTRACT_OPERATION,src/main/java/novaz/main/NovaBot.java
+DiscordBot,ca093a41efdd20e77ae8e094d1382c1a2721fbde,src/main/java/novaz/util/TimeUtil.java,EXTRACT_OPERATION,src/main/java/novaz/util/TimeUtil.java
+DiscordBot,58ab6379cc2aa99cde809fc690498316e7f05478,src/main/java/novaz/handler/MusicPlayerHandler.java,EXTRACT_OPERATION,src/main/java/novaz/handler/MusicPlayerHandler.java
+DiscordBot,6e4f728b1bec383839aef8e22178d8725f5c2e60,src/main/java/novaz/handler/GuildSettingsHandler.java,MOVE_OPERATION,src/main/java/novaz/handler/GuildSettings.java
+DiscordBot,18aca8bf875ea8ff3d252d400fa01a3031d76e53,src/main/java/novaz/main/NovaBot.java,EXTRACT_OPERATION,src/main/java/novaz/main/NovaBot.java
+DiscordBot,18aca8bf875ea8ff3d252d400fa01a3031d76e53,src/main/java/novaz/event/TrackFinishedListener.java,MOVE_OPERATION,src/main/java/novaz/handler/MusicPlayerHandler.java
+DiscordBot,18aca8bf875ea8ff3d252d400fa01a3031d76e53,src/main/java/novaz/event/TrackSkipListener.java,MOVE_OPERATION,src/main/java/novaz/handler/MusicPlayerHandler.java
