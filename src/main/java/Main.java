@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.GitService;
 import org.refactoringminer.api.Refactoring;
@@ -23,30 +24,36 @@ public class Main {
 		ArrayList<String> csvs = new ArrayList<>();
 		ArrayList<String> projects = new ArrayList<>();
 		projects.add("https://github.com/teomaik/DeRec-GEA.git");
-		//projects.add("https://github.com/jagrosh/MusicBot");
-		//projects.add("https://github.com/apache/maven-archetype");
-		//projects.add("https://github.com/apache/commons-io");
-		//projects.add("https://github.com/apache/commons-lang");
-		//projects.add("https://github.com/apache/griffin");
-		//projects.add("https://github.com/apache/johnzon");
-		//projects.add("https://github.com/apache/openwebbeans");
-		//projects.add("https://github.com/apache/unomi");
-		//projects.add("https://github.com/apache/logging-flume");
-		//projects.add("https://github.com/apache/commons-rdf");
-		//projects.add("https://github.com/apache/giraph");
-		//projects.add("https://github.com/docker-java/docker-java");
-		//projects.add("https://github.com/Kaaz/DiscordBot");
-		//projects.add("https://github.com/DiscordSRV/DiscordSRV");
-		//projects.add("https://github.com/jagrosh/Vortex");
-		//projects.add("https://github.com/Anuken/CoreBot");
-		//projects.add("https://github.com/DenizenScript/dDiscordBot");
-		//projects.add("https://github.com/wolfiabot/Wolfia");
-		//projects.add("https://github.com/spring-projects/spring-framework");
-		//projects.add("https://github.com/bumptech/glide");
-		//projects.add("https://github.com/apache/dubbo");
-		
-		
+//		projects.add("https://github.com/jagrosh/MusicBot");
+//		projects.add("https://github.com/apache/maven-archetype");
+//		projects.add("https://github.com/apache/commons-io");
+//		projects.add("https://github.com/apache/commons-lang");
+//		projects.add("https://github.com/apache/griffin");
+//		projects.add("https://github.com/apache/johnzon");
+//		projects.add("https://github.com/apache/openwebbeans");
+//		projects.add("https://github.com/apache/unomi");
+//		projects.add("https://github.com/apache/logging-flume");
+//		projects.add("https://github.com/apache/commons-rdf");
+//		projects.add("https://github.com/apache/giraph");
+//		projects.add("https://github.com/docker-java/docker-java");
+//		projects.add("https://github.com/Kaaz/DiscordBot");
+//		projects.add("https://github.com/DiscordSRV/DiscordSRV");
+//		projects.add("https://github.com/jagrosh/Vortex");
+//		projects.add("https://github.com/Anuken/CoreBot");
+//		projects.add("https://github.com/DenizenScript/dDiscordBot");
+//		projects.add("https://github.com/wolfiabot/Wolfia");
+//		projects.add("https://github.com/bumptech/glide");
+//		projects.add("https://github.com/apache/dubbo");
+//		projects.add("https://github.com/Moukaskon/InterfaceTest");
+//		projects.add("https://github.com/Moukaskon/ExtractClass");
+//		projects.add("https://github.com/Moukaskon/ExtractMeth");
+//		projects.add("https://github.com/Moukaskon/MoveMeth"); !!!!!!!!!
+//		projects.add("https://github.com/Moukaskon/MoveMethod"); !!!!!!!
+//		projects.add("https://github.com/Moukaskon/SplitRef");  !!!!!!!!
+//		projects.add("https://github.com/Moukaskon/PullUp");
+
 		System.out.println("Number of Command Line Argument = " + args.length);
+		int numOfCommits = 0;
 		for (int i = 0; i < args.length; i++) {
 			System.out.println("Command Line Argument" + i + "is" + args[i]);
 			projects.add(args[i]);
@@ -63,8 +70,8 @@ public class Main {
 		System.out.println(listString);
 
 		writeTxtFile("final_results", listString);
-//
-//        //create csv file
+
+        //create csv file
 //        try {
 //            FileWriter writer = new FileWriter(new File(System.getProperty("user.dir")+"/data_projects.csv"));
 //            writer.write("projectName,SHA,file,rank,DSC,WMC,DIT,CC,LCOM,MPC,NOM,RFC,DAC,NOCC,CBO,SIZE1,SIZE2,REFACTORED" + System.lineSeparator());
@@ -76,10 +83,34 @@ public class Main {
 //            throw new RuntimeException(e);
 //        }
 
+//		List<CommitObj> commitIds = new ArrayList<CommitObj>();
+//		GitService gitService = new GitServiceImpl();
+//		for (String prj : projects) {
+//			String projectName = "Allprojects"+ File.separator + prj.split("/")[prj.split("/").length - 1];
+//            try {
+//                Repository repo = gitService.cloneIfNotExists(projectName, prj);
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//
+//			String projectPath = System.getProperty("user.dir") + File.separator + projectName;
+//            Git git = null;
+//            try {
+//                git = Git.open(new File(projectPath));
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//            commitIds = Utils.getCommitIds(git);
+//			numOfCommits += commitIds.size();
+//		}
+
+
+
+//		System.out.println("Number of commits in total = " + numOfCommits);
 	}
 
 
-	public static String runAnalysis(String gitURL) {
+	public static String runAnalysis(String gitURL){
 		// Get url and name
 		gitURL = gitURL.replace(".git", "");
 		String projectName = "Allprojects"+ File.separator + gitURL.split("/")[gitURL.split("/").length - 1];
@@ -95,9 +126,9 @@ public class Main {
 		GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
 
 		System.out.println("after git,miner()");
-		ArrayList<String> refactoringTypesToKeep = new ArrayList<>(Arrays.asList("PULL_UP_METHOD","EXTRACT_SUPERCLASS",
-		"EXTRACT_INTERFACE", "EXTRACT_AND_MOVE_METHOD", "EXTRACT_CLASS","MOVE_AND_RENAME_METHOD",
-		 "SPLIT_CLASS", "EXTRACT_OPERATION", "MOVE_OPERATION"));
+		ArrayList<String> refactoringTypesToKeep = new ArrayList<>(Arrays.asList("EXTRACT_SUPERCLASS",
+		"EXTRACT_INTERFACE", "EXTRACT_CLASS", "MOVE_AND_RENAME_OPERATION", "SPLIT_CLASS",
+		"EXTRACT_OPERATION", "MOVE_OPERATION", "PULL_UP_OPERATION", "EXTRACT_AND_MOVE_OPERATION"));
 
 		List<CommitObj> commitIds = new ArrayList<CommitObj>();
 		try {
@@ -105,70 +136,80 @@ public class Main {
 
 			Git git = Git.open(new File(projectPath));
 			System.out.println("afterGit.open()");
-			
+
+			Iterable<RevCommit> commits = git.log().call();
+
+			for (RevCommit commit : commits) {
+				System.out.println(commit.getName());
+			}
+
+
 			commitIds = Utils.getCommitIds(git);
 
-			miner.detectAll(repo, null, new RefactoringHandler() {
-				@Override
-				public void handle(String commitId, List<Refactoring> refactorings) {
-					if (!refactorings.isEmpty()) {
-						// Create CommitBeforeRef
-
-						List<String> refactoringTypes = new ArrayList<>();
-						List<List<String>> involvedFilesBeforeRefactoring = new ArrayList<>();
-						List<List<String>> involvedFilesAfterRefactoring = new ArrayList<>();
-						
-						for (Refactoring ref : refactorings) {
-							// System.out.println("\n\n" + ref.getRefactoringType().toString() + "\n\n\n");
-							// try (BufferedWriter writer = new BufferedWriter(new FileWriter("refactorings_output3.txt", true))) {
-							// 	writer.write(ref.getRefactoringType().toString() + "\n");
-							// 	writer.write("-----\n"); // separator between commits
-							// } catch (IOException e) {
-							// 	e.printStackTrace();
-							// }
-							if (!refactoringTypesToKeep.contains(ref.getRefactoringType().toString())) {
-								continue;
-							}
-
-							boolean hadRef = false;
-							int index = 0;
-							System.out.println("\n\n\n" + ref.getInvolvedClassesBeforeRefactoring() + "\n\n\n");
-							refactoringTypes.add(ref.getRefactoringType().toString());
-							involvedFilesBeforeRefactoring.add(new ArrayList<>());
-							involvedFilesAfterRefactoring.add(new ArrayList<>());
-
-							for (ImmutablePair<String, String> immutablePair : ref.getInvolvedClassesBeforeRefactoring()) {
-								System.out.println(immutablePair + "1st\n\n\n");
-								hadRef = true;
-								involvedFilesBeforeRefactoring.get(involvedFilesBeforeRefactoring.size() - 1).add(immutablePair.left);
-
-							}
-
-							
-							for (ImmutablePair<String, String> immutablePair : ref.getInvolvedClassesAfterRefactoring()) {
-								System.out.println(immutablePair + "2nd\n\n\n");
-								involvedFilesAfterRefactoring.get(involvedFilesAfterRefactoring.size() - 1).add(immutablePair.left);
-							}
-							
-
-							
-						}
-						// Parallel lists, might refactor later. Refactorings list is parallel with commitBeforeRefs and commitAfterRefs
-						if(!involvedFilesBeforeRefactoring.isEmpty()){
-							CommitBeforeRef commitBeforeRef = new CommitBeforeRef(commitId, refactoringTypes,
-									involvedFilesBeforeRefactoring);
-							commitBeforeRefs.add(commitBeforeRef);
-						}
-
-						if(!involvedFilesAfterRefactoring.isEmpty() && !involvedFilesBeforeRefactoring.isEmpty()){
-							CommitAfterRef commitAfterRef = new CommitAfterRef(commitId, refactoringTypes,
-									involvedFilesAfterRefactoring);
-							commitAfterRefs.add(commitAfterRef);
-						}
-					}
-					//System.out.println("\n\n\n End miner \n\n\n");
-				}
-			});
+//			miner.detectAll(repo, null, new RefactoringHandler() {
+//
+//				@Override
+//				public void handle(String commitId, List<Refactoring> refactorings) {
+//					System.out.println(commitId);
+//					if (!refactorings.isEmpty()) {
+//						// Create CommitBeforeRef
+//
+//						List<String> refactoringTypes = new ArrayList<>();
+//						List<List<String>> involvedFilesBeforeRefactoring = new ArrayList<>();
+//						List<List<String>> involvedFilesAfterRefactoring = new ArrayList<>();
+//
+//						for (Refactoring ref : refactorings) {
+//							// System.out.println("\n\n" + ref.getRefactoringType().toString() + "\n\n\n");
+//							// try (BufferedWriter writer = new BufferedWriter(new FileWriter("refactorings_output3.txt", true))) {
+//							// 	writer.write(ref.getRefactoringType().toString() + "\n");
+//							// 	writer.write("-----\n"); // separator between commits
+//							// } catch (IOException e) {
+//							// 	e.printStackTrace();
+//							// }
+//							//System.out.println(ref);
+//							if (!refactoringTypesToKeep.contains(ref.getRefactoringType().toString())) {
+//								continue;
+//							}
+//
+//							boolean hadRef = false;
+//							int index = 0;
+//							System.out.println("\n\n\n" + ref.getInvolvedClassesBeforeRefactoring() + "\n\n\n");
+//							refactoringTypes.add(ref.getRefactoringType().toString());
+//							involvedFilesBeforeRefactoring.add(new ArrayList<>());
+//							involvedFilesAfterRefactoring.add(new ArrayList<>());
+//
+//							for (ImmutablePair<String, String> immutablePair : ref.getInvolvedClassesBeforeRefactoring()) {
+//								System.out.println(immutablePair + "1st\n\n\n");
+//								hadRef = true;
+//								involvedFilesBeforeRefactoring.get(involvedFilesBeforeRefactoring.size() - 1).add(immutablePair.left);
+//
+//							}
+//
+//
+//							for (ImmutablePair<String, String> immutablePair : ref.getInvolvedClassesAfterRefactoring()) {
+//								System.out.println(immutablePair + "2nd\n\n\n");
+//								involvedFilesAfterRefactoring.get(involvedFilesAfterRefactoring.size() - 1).add(immutablePair.left);
+//							}
+//
+//
+//
+//						}
+//						// Parallel lists, might refactor later. Refactorings list is parallel with commitBeforeRefs and commitAfterRefs
+//						if(!involvedFilesBeforeRefactoring.isEmpty()){
+//							CommitBeforeRef commitBeforeRef = new CommitBeforeRef(commitId, refactoringTypes,
+//									involvedFilesBeforeRefactoring);
+//							commitBeforeRefs.add(commitBeforeRef);
+//						}
+//
+//						if(!involvedFilesAfterRefactoring.isEmpty() && !involvedFilesBeforeRefactoring.isEmpty()){
+//							CommitAfterRef commitAfterRef = new CommitAfterRef(commitId, refactoringTypes,
+//									involvedFilesAfterRefactoring);
+//							commitAfterRefs.add(commitAfterRef);
+//						}
+//					}
+//					//System.out.println("\n\n\n End miner \n\n\n");
+//				}
+//			});
 		} catch (Exception e) {
 			errorMesg += e + "\n";
 			System.out.println(e);
@@ -380,13 +421,10 @@ public class Main {
 				
 					writer.write(String.format("%s,%s,\"%s\",%s,\"%s\"%n", projectName.replace("Allprojects" + File.separator, ""), sha, beforeJoined, ref, afterJoined));
 				}
-
-
 			}
 			System.out.println("CSV file saved: " + filePath);
 		} catch (IOException e) {
 			System.out.println("Error writing CSV: " + e.getMessage());
 		}
     }
-
 }

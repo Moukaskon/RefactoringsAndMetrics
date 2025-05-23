@@ -1,0 +1,4 @@
+projectName,SHA,Files Before ref,RefactoringType,files After
+ExtractMeth,39cf2d8bcebb675ce9e4ba18fd1c741306699b68,"src/ReportGenerator.java",EXTRACT_OPERATION,"src/ReportGenerator.java"
+ExtractMeth,39cf2d8bcebb675ce9e4ba18fd1c741306699b68,"src/ReportGenerator.java",EXTRACT_OPERATION,"src/ReportGenerator.java"
+ExtractMeth,39cf2d8bcebb675ce9e4ba18fd1c741306699b68,"src/ReportGenerator.java",EXTRACT_OPERATION,"src/ReportGenerator.java"

@@ -1,0 +1,6 @@
+projectName,SHA,Files Before ref,RefactoringType,files After
+SuperclassTest,e35d24c1c6698674ea4e0b62dc137d1fb823cf10,"src/Developer.java; src/Manager.java",EXTRACT_SUPERCLASS,"src/Developer.java; src/Manager.java; src/Employee.java"
+SuperclassTest,e35d24c1c6698674ea4e0b62dc137d1fb823cf10,"src/Developer.java",PULL_UP_OPERATION,"src/Employee.java"
+SuperclassTest,e35d24c1c6698674ea4e0b62dc137d1fb823cf10,"src/Developer.java",PULL_UP_OPERATION,"src/Employee.java"
+SuperclassTest,e35d24c1c6698674ea4e0b62dc137d1fb823cf10,"src/Manager.java",PULL_UP_OPERATION,"src/Employee.java"
+SuperclassTest,e35d24c1c6698674ea4e0b62dc137d1fb823cf10,"src/Manager.java",PULL_UP_OPERATION,"src/Employee.java"

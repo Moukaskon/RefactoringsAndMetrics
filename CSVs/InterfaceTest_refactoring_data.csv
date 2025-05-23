@@ -1,0 +1,2 @@
+projectName,SHA,Files Before ref,RefactoringType,files After
+InterfaceTest,9f182cad6c20a064c22cac3753a0d978cf5cc969,"src/Circle.java; src/Rectangle.java",EXTRACT_INTERFACE,"src/Circle.java; src/Rectangle.java; src/Drawable.java"

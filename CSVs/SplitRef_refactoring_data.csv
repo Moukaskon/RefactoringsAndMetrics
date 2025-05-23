@@ -1,0 +1,3 @@
+projectName,SHA,Files Before ref,RefactoringType,files After
+SplitRef,ce731cbcdef9ca1e6cffcc0a6847d7b41a8683bd,"src/User.java",EXTRACT_CLASS,"src/User.java; src/Account.java"
+SplitRef,ce731cbcdef9ca1e6cffcc0a6847d7b41a8683bd,"src/User.java",EXTRACT_CLASS,"src/User.java; src/PersonalInfo.java"

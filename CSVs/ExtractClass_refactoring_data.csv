@@ -1,0 +1,5 @@
+projectName,SHA,Files Before ref,RefactoringType,files After
+ExtractClass,56586ec603c615d2fecde9c96224deef9c9d3165,src/Person.java,EXTRACT_CLASS,src/Person.java; src/ContactInfo.java
+ExtractClass,56586ec603c615d2fecde9c96224deef9c9d3165,src/Person.java,MOVE_OPERATION,src/ContactInfo.java
+ExtractClass,56586ec603c615d2fecde9c96224deef9c9d3165,src/Person.java,MOVE_OPERATION,src/ContactInfo.java
+ExtractClass,56586ec603c615d2fecde9c96224deef9c9d3165,src/Person.java,MOVE_OPERATION,src/ContactInfo.java
