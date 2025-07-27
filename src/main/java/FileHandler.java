@@ -2,29 +2,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileHandler {
-    ArrayList<CommitBeforeRef> commitBeforeRefs;
-    ArrayList<CommitAfterRef> commitAfterRefs;
-    String commitSha;
+    String filesAfterRefs = "";
+    String commitSha = "";
+    String isRefactored = "";
+    String filaPath = "";
+    String commitNumber = "";
+    String refactorings = "";
 
-    public FileHandler(ArrayList<CommitBeforeRef> commitBeforeRefs, ArrayList<CommitAfterRef> commitAfterRefs, String commitSha) {
-        this.commitBeforeRefs = commitBeforeRefs;
-        this.commitAfterRefs = commitAfterRefs;
+
+    public FileHandler(String refactorings, String filesAfterRefs, String commitSha, String filaPath, String commitNumber) {
+        this.refactorings = refactorings;
+        this.filesAfterRefs = filesAfterRefs;
         this.commitSha = commitSha;
+        if(filesAfterRefs != "\""){
+            this.isRefactored = "1";
+        }else{
+            this.isRefactored = "0";
+        }
+
+        this.filaPath = filaPath;
+        this.commitNumber = commitNumber;
     }
 
-    public ArrayList<CommitBeforeRef> getCommitBeforeRefs() {
-        return commitBeforeRefs;
+    public FileHandler(){
+
     }
 
-    public ArrayList<CommitAfterRef> getCommitAfterRefs() {
-        return commitAfterRefs;
+    public String getFilesAfterRefs() {
+        return filesAfterRefs;
     }
+
     public String getCommitSha() {
         return commitSha;
     }
 
+    public String getIsRefactored() {
+        return isRefactored;
+    }
+
+    public String getFilaPath() {
+        return filaPath;
+    }
+
+    public String getCommitNumber() {
+        return commitNumber;
+    }
+
+    public String getRefactorings() {
+        return refactorings;
+    }
+
+    public void setAll(String filesAfterRefs, String refactorings) {
+        this.filesAfterRefs += filesAfterRefs;
+        this.refactorings += refactorings;
+    }
+
     @Override
     public String toString() {
-        return "FileHandler [commitBeforeRefs=" + commitBeforeRefs + ", commitAfterRefs=" + commitAfterRefs + "]";
+        return "FileHandler [filesBeforeRefs=" + ", filesAfterRefs=" +
+                filesAfterRefs + ", commitSha=" + commitSha + ", isRefactored="
+                + isRefactored + ", filaPath=" + filaPath + ", commitNumber=" + commitNumber + "]";
     }
 }

@@ -1,2 +1,2 @@
 # RefactoringsAndMetrics
-Get Refactorings and metrics for previous commit
+Get Ref and metrics for previous commit

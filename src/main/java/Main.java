@@ -1,29 +1,26 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.refactoringminer.RefactoringMiner;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.GitService;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringHandler;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.util.GitServiceImpl;
+
 
 public class Main {
 
@@ -132,7 +129,7 @@ public class Main {
 
 		List<CommitObj> commitIds = new ArrayList<CommitObj>();
 
-		csvWritingTest(projectName, 5, gitURL, projectPath);
+		writeXlsxText(projectName, 5, gitURL, projectPath);
 
 		int commitStep = 5;
 
@@ -347,6 +344,178 @@ public class Main {
 		}
 	}
 
+
+	//LETS TRY XLSX
+
+	public static void writeXlsxText(String projectName, int step, String gitURL, String projectPath) throws IOException, GitAPIException {
+
+		int commitNumber = 0;
+		GitService gitService = new GitServiceImpl();
+
+		int x = commitNumber + step - 1;
+		String filePath;
+		Workbook workbook;
+		Sheet sheet;
+
+		sheet = null;
+		workbook = null;
+
+		// Prepare the file path
+		filePath = "XLSXs" + File.separator +
+				projectName.replace("Allprojects" + File.separator, "") +
+				commitNumber + " - " + x + "_refactoring_data.xlsx";
+
+		File file = new File(filePath);
+
+//		if (!file.exists()) {
+//			// Create new workbook and sheet
+//			workbook = new XSSFWorkbook();
+//			sheet = workbook.createSheet("Refactorings");
+//
+//			// Write header
+//			Row header = sheet.createRow(0);
+//			header.createCell(0).setCellValue("projectName");
+//			header.createCell(1).setCellValue("SHA");
+//			header.createCell(2).setCellValue("CommitNumber");
+//			header.createCell(3).setCellValue("Files");
+//			header.createCell(4).setCellValue("Refactored");
+//			header.createCell(5).setCellValue("RefactoringType");
+//			header.createCell(6).setCellValue("Affected Files");
+//		}
+//		else
+//		{
+//			// Open existing file
+//			FileInputStream fis = new FileInputStream(file);
+//			workbook = new XSSFWorkbook(fis);
+//			sheet = workbook.getSheetAt(0);
+//			fis.close();
+//		}
+
+		Git git = Git.open(new File(projectPath));
+		System.out.println("afterGit.open()");
+
+		Iterable<RevCommit> commits = git.log().call();
+		String sha;
+		HashMap<String, Integer> fileList = new HashMap<>();
+		ArrayList<Ref> refHandler;
+
+
+		for (RevCommit commitSHA : commits) {
+			if(commitNumber % step == 0) {
+				x = commitNumber + step - 1;
+				filePath = "XLSXs" + File.separator +
+						projectName.replace("Allprojects" + File.separator, "") +
+						commitNumber + " - " + x + "_refactoring_data.xlsx";
+
+				File startFile = new File(filePath);
+
+				if (!startFile.exists()) {
+					// Create new workbook and sheet
+					workbook = new XSSFWorkbook();
+					sheet = workbook.createSheet("Refactorings");
+
+					// Write header
+					Row header = sheet.createRow(0);
+					header.createCell(0).setCellValue("projectName");
+					header.createCell(1).setCellValue("SHA");
+					header.createCell(2).setCellValue("CommitNumber");
+					header.createCell(3).setCellValue("Files");
+					header.createCell(4).setCellValue("Refactored");
+					header.createCell(5).setCellValue("RefactoringType");
+					header.createCell(6).setCellValue("Affected Files");
+				}else {
+					// Open existing file
+					FileInputStream fis = new FileInputStream(file);
+					workbook = new XSSFWorkbook(fis);
+					sheet = workbook.getSheetAt(0);
+					fis.close();
+				}
+			}
+			int lastRowNum = sheet.getLastRowNum() + 1;
+			sha = commitSHA.getName();
+			Repository repository = git.getRepository();
+			RevWalk revWalk = new RevWalk(repository);
+			RevCommit commit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
+			RevTree tree = commit.getTree();
+			HashMap<String, FileHandler> handlerListTest = new HashMap<>();
+
+			try (TreeWalk treeWalk = new TreeWalk(repository)) {
+				treeWalk.addTree(tree);
+				treeWalk.setRecursive(true);
+
+				while (treeWalk.next()) {
+					String path = treeWalk.getPathString();
+					if (path.endsWith(".java")) {
+						Row row = sheet.createRow(lastRowNum);
+						fileList.put(path, lastRowNum);
+						row.createCell(0).setCellValue(projectName);
+						row.createCell(1).setCellValue(sha);
+						row.createCell(2).setCellValue(commitNumber);
+						row.createCell(3).setCellValue(path);
+						row.createCell(4).setCellValue(0);
+						lastRowNum += 1;
+
+						handlerListTest.put(path, new FileHandler());
+					}
+				}
+				commitNumber++;
+
+				refHandler = detectRefs(commitSHA.getName(), repository);
+
+				for(int i = 0; i < refHandler.size(); i++) {
+					ArrayList<String> commitBeforeRef = refHandler.get(i).getFilesBeforeRef();
+					ArrayList<String> commitAfterRef = refHandler.get(i).getFilesAfterRef();
+					String refName = refHandler.get(i).getRefactoringName();
+					System.out.println("This is the ref: " + refName);
+					for (int j = 0; j < commitBeforeRef.size(); j++) {
+//					System.out.println("Is " + commitBeforeRef.get(j) + " in fileList: " + fileList.containsKey(commitBeforeRef.get(j)) +
+//							" Keys: " + fileList.get(commitBeforeRef.get(j)));
+						String fileName = commitBeforeRef.get(j);
+						System.out.println(fileList.containsKey(fileName) + " " + fileName + " " + fileList);
+						if (fileList.containsKey(fileName)) {
+							int rowIndex = fileList.get(fileName);
+							System.out.println(fileName + "\nIn here!! \n" + rowIndex);
+							Row row = sheet.getRow(rowIndex);
+							row.getCell(4).setCellValue(1);
+							Cell cellRefName = row.getCell(5);
+							if (cellRefName == null) {
+								cellRefName = row.createCell(5);
+							}
+
+							cellRefName.setCellValue(refName + ";" + cellRefName.getStringCellValue());
+							String allFilesInvolved = "";
+							for(String fileInvolved: commitAfterRef){
+								allFilesInvolved += fileInvolved + ";";
+							}
+							Cell cellInvolved = row.getCell(6);
+							if (cellInvolved == null) {
+								cellInvolved = row.createCell(6);
+							}
+							cellInvolved.setCellValue(allFilesInvolved + " | " + cellInvolved.getStringCellValue());
+						}
+					}
+				}
+			} catch (Exception e) {
+				//To do
+			}
+			if(commitNumber % 5 == 0) {
+				FileOutputStream fos = new FileOutputStream(filePath);
+				workbook.write(fos);
+				fos.close();
+				workbook.close();
+			}
+		}
+		FileOutputStream fos = new FileOutputStream(filePath);
+		workbook.write(fos);
+		fos.close();
+		workbook.close();
+	}
+
+
+
+
+
+
 	private static void csvWritingTest(String projectName, int step, String gitURL, String projectPath) throws GitAPIException, IOException {
 		int commitNumber = 0;
 		int refNumber = 0;
@@ -363,43 +532,109 @@ public class Main {
 
 		Iterable<RevCommit> commits = git.log().call();
 		String sha;
-		ArrayList<String> fileList = new ArrayList<>();
+		HashMap<String, ArrayList<Ref>> fileList = new HashMap<>();
 		FileWriter writer = null;
-		FileHandler fileHandler;
+		ArrayList<Ref> refHandler;
 		ArrayList<CommitBeforeRef> commitBeforeRefs;
 		ArrayList<CommitAfterRef> commitAfterRefs;
 
 
 		for (RevCommit commitSHA : commits) {
 			commitNumber++;
+			ArrayList<FileHandler> handlerList = new ArrayList<>();
 			sha = commitSHA.getName();
 			Repository repository = git.getRepository();
 			RevWalk revWalk = new RevWalk(repository);
 			RevCommit commit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
 			RevTree tree = commit.getTree();
-			fileHandler = detectRefs(commitSHA.getName(), repository);
-			System.out.println(fileHandler);
-			commitBeforeRefs = fileHandler.getCommitBeforeRefs();
-			commitAfterRefs = fileHandler.getCommitAfterRefs();
-			for(int i = 0; i < commitBeforeRefs.size(); i++) {
-				CommitBeforeRef commitBeforeRef = commitBeforeRefs.get(i);
-				CommitAfterRef commitAfterRef = commitAfterRefs.get(i);
-				List<String> refs = commitBeforeRef.getRefactoringTypes();
-				System.out.println("These are the refs: " + refs);
-				for (int j = 0; j < refs.size(); j++) {
-					List<String> beforeFiles = commitBeforeRef.getInvolvedFilesBeforeRefactoring().get(i);
-					System.out.println("How many files before ref are involved: " + beforeFiles);
-					String ref = refs.get(i);
-					List<String> afterFiles = commitAfterRef.getInvolvedFilesAfterRefactoring().get(i);
-					System.out.println("How many files after ref are involved: " + afterFiles);
+			HashMap<String, FileHandler> handlerListTest = new HashMap<>();
 
-					String beforeJoined = String.join("; ", beforeFiles);
-					String afterJoined = String.join("; ", afterFiles);
+			try (TreeWalk treeWalk = new TreeWalk(repository)) {
+				treeWalk.addTree(tree);
+				treeWalk.setRecursive(true);
+
+				while (treeWalk.next()) {
+					String path = treeWalk.getPathString();
+					if (path.endsWith(".java")) {
+						fileList.put(path, new ArrayList<>());
+						handlerListTest.put(path, new FileHandler());
+					}
+				}
+			} catch (Exception e) {
+				//To do
+			}
+			int x = commitNumber + step - 1;
+			String filePath = "CSVs" + File.separator + projectName.replace("Allprojects"
+					+ File.separator, "") + commitNumber + " - " + x + "_refactoring_data.csv";
+
+			System.out.println("Outside if filepath: " + filePath);
+
+			if(writer == null) {
+				System.out.println("Inside filepath if: " + filePath);
+				writer = new FileWriter(filePath);
+				writer.write("projectName,SHA,CommitNumber,Files,Refactored,RefactoringType,Affected Files\n");
+			}
+
+			refHandler = detectRefs(commitSHA.getName(), repository);
+			System.out.println(refHandler);
+
+			for(int i = 0; i < refHandler.size(); i++) {
+				ArrayList<String> commitBeforeRef = refHandler.get(i).getFilesBeforeRef();
+				String refName = refHandler.get(i).getRefactoringName();
+				System.out.println("This is the ref: " + refName);
+				String refactorings = "";
+				String filesInvolved = "";
+				for (int j = 0; j < commitBeforeRef.size(); j++) {
+//					System.out.println("Is " + commitBeforeRef.get(j) + " in fileList: " + fileList.containsKey(commitBeforeRef.get(j)) +
+//							" Keys: " + fileList.get(commitBeforeRef.get(j)));
+					String fileName = commitBeforeRef.get(j);
+					if(fileList.containsKey(fileName)) {
+						ArrayList<Ref> tempRefs = fileList.get(fileName);
+						tempRefs.add(refHandler.get(i));
+						fileList.put(fileName, tempRefs);
+					}
 
 					//writer.write(String.format("%s,%s,\"%s\",%s,\"%s\"%n", projectName.replace("Allprojects" + File.separator, ""), sha, beforeJoined, ref, afterJoined));
 				}
+				System.out.println("fileList size: " + fileList.size());
+				for (Map.Entry<String, ArrayList<Ref>> node : fileList.entrySet()) {
+					ArrayList<Ref> refs = node.getValue();
+					System.out.println("In the begining: " + node.getValue());
+					for (Ref ref : refs) {
+						refactorings += ref.getRefactoringName() + " ";
+						filesInvolved = String.join(" ", ref.getFilesAfterRef());
+						filesInvolved = filesInvolved + "\" ";
+					}
+					System.out.println("Refactorings to be written: " + refactorings + " for the file: " + node.getKey());
+					System.out.println(handlerListTest.get(node.getKey()));
+					if(handlerListTest.get(node.getKey()).getFilaPath().equals("")) {
+						FileHandler aHandler = new FileHandler(refactorings, filesInvolved, commitSHA.getName(), node.getKey(), String.valueOf(commitNumber));
+						handlerListTest.put(node.getKey(), aHandler);
+					}else{
+						FileHandler handle = handlerListTest.get(node.getKey());
+						handle.setAll(filesInvolved, refactorings);
+						handlerListTest.put(node.getKey(), handle);
+					}
+					System.out.println("At the end: " + node.getKey());
+					fileList.put(node.getKey(), new ArrayList<>());
+				}
 
 			}
+//			System.out.println("handlerList size: " + handlerList.size());
+		for (Map.Entry<String, FileHandler> node : handlerListTest.entrySet()) {
+//				System.out.println(handlerList.get(i).getRefactorings() + " Inside writing to excel: " + String.format("%s,%s,%s,%s,%s,%s,%n",
+//						projectName.replace("Allprojects" + File.separator, ""),
+//						sha, commitNumber, handlerList.get(i).getFilaPath(), handlerList.get(i).getRefactorings(),
+//						handlerList.get(i).getFilesAfterRefs()));
+
+			writer.write(String.format("%s,%s,%s,%s,%s,%s,%n", projectName.replace("Allprojects" +
+					File.separator, ""), sha, commitNumber, node.getValue().getFilaPath(),
+					node.getValue().getRefactorings(), node.getValue().getFilesAfterRefs()));
+		}
+
+		if(commitNumber % 5 == 0){
+			writer = null;
+		}
 
 //			try (TreeWalk treeWalk = new TreeWalk(repository)) {
 //				treeWalk.addTree(tree);
@@ -445,11 +680,10 @@ public class Main {
 
 	}
 
-	public static FileHandler detectRefs(String commitSHA, Repository repo) throws GitAPIException, IOException {
+	public static ArrayList<Ref> detectRefs(String commitSHA, Repository repo) throws GitAPIException, IOException {
 
 		GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
-		ArrayList<CommitBeforeRef> commitBeforeRefs = new ArrayList<>();
-		ArrayList<CommitAfterRef> commitAfterRefs = new ArrayList<>();
+		ArrayList<Ref> refList = new ArrayList<>();
 		ArrayList<String> refactoringTypesToKeep = new ArrayList<>(Arrays.asList("EXTRACT_SUPERCLASS",
 				"EXTRACT_INTERFACE", "EXTRACT_CLASS", "MOVE_AND_RENAME_OPERATION", "SPLIT_CLASS",
 				"EXTRACT_OPERATION", "MOVE_OPERATION", "PULL_UP_OPERATION", "EXTRACT_AND_MOVE_OPERATION"));
@@ -458,12 +692,6 @@ public class Main {
 			public void handle(String commitId, List<Refactoring> refactorings) {
 				System.out.println(commitId);
 				if (!refactorings.isEmpty()) {
-					// Create CommitBeforeRef
-
-					List<String> refactoringTypes = new ArrayList<>();
-					List<List<String>> involvedFilesBeforeRefactoring = new ArrayList<>();
-					List<List<String>> involvedFilesAfterRefactoring = new ArrayList<>();
-
 					for (Refactoring ref : refactorings) {
 						// System.out.println("\n\n" + ref.getRefactoringType().toString() + "\n\n\n");
 						// try (BufferedWriter writer = new BufferedWriter(new FileWriter("refactorings_output3.txt", true))) {
@@ -477,45 +705,26 @@ public class Main {
 							continue;
 						}
 
-						int index = 0;
+						Ref aRef = new Ref(ref.getRefactoringType().toString(), commitSHA);
 						//System.out.println("\n\n\n" + ref.getInvolvedClassesBeforeRefactoring() + "\n\n\n");
-						refactoringTypes.add(ref.getRefactoringType().toString());
-						involvedFilesBeforeRefactoring.add(new ArrayList<>());
-						involvedFilesAfterRefactoring.add(new ArrayList<>());
 
 						for (ImmutablePair<String, String> immutablePair : ref.getInvolvedClassesBeforeRefactoring()) {
 							//System.out.println(immutablePair + "1st\n\n\n");
-							involvedFilesBeforeRefactoring.get(involvedFilesBeforeRefactoring.size() - 1).add(immutablePair.left);
-
+							aRef.addBeforeRefFile(immutablePair.left);
 						}
-
 
 						for (ImmutablePair<String, String> immutablePair : ref.getInvolvedClassesAfterRefactoring()) {
 							//System.out.println(immutablePair + "2nd\n\n\n");
-							involvedFilesAfterRefactoring.get(involvedFilesAfterRefactoring.size() - 1).add(immutablePair.left);
+							aRef.addAfterRefFile(immutablePair.left);
 						}
-
-
-
-					}
-					// Parallel lists, might refactor later. Refactorings list is parallel with commitBeforeRefs and commitAfterRefs
-					if(!involvedFilesBeforeRefactoring.isEmpty()){
-						CommitBeforeRef commitBeforeRef = new CommitBeforeRef(commitId, refactoringTypes,
-								involvedFilesBeforeRefactoring);
-						commitBeforeRefs.add(commitBeforeRef);
-					}
-
-					if(!involvedFilesAfterRefactoring.isEmpty() && !involvedFilesBeforeRefactoring.isEmpty()){
-						CommitAfterRef commitAfterRef = new CommitAfterRef(commitId, refactoringTypes,
-								involvedFilesAfterRefactoring);
-						commitAfterRefs.add(commitAfterRef);
+						refList.add(aRef);
 					}
 				}
 				//System.out.println("\n\n\n End miner \n\n\n");
 				//System.out.println(commitAfterRefs + "\n\n\n" + commitBeforeRefs + "\n\n\n");
 			}
 		});
-		return new FileHandler(commitBeforeRefs, commitAfterRefs, commitSHA);
+		return refList;
 	}
 
 
