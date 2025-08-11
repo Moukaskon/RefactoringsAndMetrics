@@ -1,3 +1,5 @@
+package main.java;
+
 import java.io.*;
 import java.util.*;
 
@@ -121,7 +123,7 @@ public class Main {
 		String projectPath = System.getProperty("user.dir") + File.separator + projectName;
 		String errorMesg = "";
 
-		System.out.println("runAnalysis()");
+		System.out.println("runAnalysis()" + projectPath);
 
 		// Get refactorings
 
@@ -391,6 +393,13 @@ public class Main {
 //			fis.close();
 //		}
 
+		try {
+			Repository repo = gitService.cloneIfNotExists(projectName, gitURL);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		System.out.println("In there" + projectPath);
 		Git git = Git.open(new File(projectPath));
 		System.out.println("afterGit.open()");
 
@@ -401,6 +410,8 @@ public class Main {
 
 
 		for (RevCommit commitSHA : commits) {
+			Analysis analysis = new Analysis(projectPath);
+			analysis.StartAnalysis();
 			if(commitNumber % step == 0) {
 				x = commitNumber + step - 1;
 				filePath = "XLSXs" + File.separator +
@@ -423,6 +434,16 @@ public class Main {
 					header.createCell(4).setCellValue("Refactored");
 					header.createCell(5).setCellValue("RefactoringType");
 					header.createCell(6).setCellValue("Affected Files");
+					header.createCell(7).setCellValue("DIT");
+					header.createCell(8).setCellValue("CC");
+					header.createCell(9).setCellValue("LCOM");
+					header.createCell(10).setCellValue("MPC");
+					header.createCell(11).setCellValue("NOM");
+					header.createCell(12).setCellValue("RFC");
+					header.createCell(13).setCellValue("DAC");
+					header.createCell(14).setCellValue("NOCC");
+					header.createCell(15).setCellValue("CBO");
+					header.createCell(16).setCellValue("SIZE1");
 				}else {
 					// Open existing file
 					FileInputStream fis = new FileInputStream(file);
@@ -442,8 +463,10 @@ public class Main {
 			try (TreeWalk treeWalk = new TreeWalk(repository)) {
 				treeWalk.addTree(tree);
 				treeWalk.setRecursive(true);
-
+				int index = 0;
+				ArrayList<JavaFile> javaFiles = analysis.getJavaFiles();
 				while (treeWalk.next()) {
+					JavaFile javaFile = javaFiles.get(index);
 					String path = treeWalk.getPathString();
 					if (path.endsWith(".java")) {
 						Row row = sheet.createRow(lastRowNum);
@@ -453,11 +476,23 @@ public class Main {
 						row.createCell(2).setCellValue(commitNumber);
 						row.createCell(3).setCellValue(path);
 						row.createCell(4).setCellValue(0);
-						lastRowNum += 1;
+						row.createCell(7).setCellValue(javaFile.getDIT());
+						row.createCell(8).setCellValue(javaFile.getCC());
+						row.createCell(9).setCellValue(javaFile.getLCOM());
+						row.createCell(10).setCellValue(javaFile.getMPC());
+						row.createCell(11).setCellValue(javaFile.getNOM());
+						row.createCell(12).setCellValue(javaFile.getRFC());
+						row.createCell(13).setCellValue(javaFile.getDAC());
+						row.createCell(14).setCellValue(javaFile.getNOCC());
+						row.createCell(15).setCellValue(javaFile.getCBO());
+						row.createCell(16).setCellValue(javaFile.getSIZE1());
+						index++;
+						lastRowNum++;
 
 						handlerListTest.put(path, new FileHandler());
 					}
 				}
+				System.out.println("Updating commit number");
 				commitNumber++;
 
 				refHandler = detectRefs(commitSHA.getName(), repository);

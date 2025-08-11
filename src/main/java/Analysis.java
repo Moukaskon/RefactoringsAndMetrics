@@ -1,3 +1,5 @@
+package main.java;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -17,7 +19,9 @@ public class Analysis {
         getJavaFiles(projectPath);
         System.out.println("number of files: " + javaFiles.size());
         getMetricsCalculatorMetrics();
+        System.out.println(javaFiles);
         System.out.println("Got the metrics!");
+        javaFiles.clear();
     }
 
     /**
@@ -29,6 +33,7 @@ public class Analysis {
         //For Linux
         try {
             String home = System.getProperty("user.dir");
+            home += "\\Metrics\\target";
             if(!System.getProperty("os.name").toLowerCase().contains("win")) {
                 ProcessBuilder pbuilder2 = new ProcessBuilder("bash", "-c", "cd " + home +
                         "; java -jar -Xmx32g metricsCalculatorLite-1.0-SNAPSHOT-jar-with-dependencies.jar "+ projectPath + " "+thread);
@@ -64,7 +69,6 @@ public class Analysis {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         try {
             File myObj = new File("thread-" +thread+ ".txt");

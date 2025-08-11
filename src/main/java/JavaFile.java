@@ -1,3 +1,5 @@
+package main.java;
+
 public class JavaFile {
     private String path;
     private Double rank= 0.0;
