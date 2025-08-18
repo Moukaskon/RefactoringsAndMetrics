@@ -399,19 +399,22 @@ public class Main {
 			throw new RuntimeException(e);
 		}
 
-		System.out.println("In there" + projectPath);
 		Git git = Git.open(new File(projectPath));
-		System.out.println("afterGit.open()");
 
 		Iterable<RevCommit> commits = git.log().call();
 		String sha;
 		HashMap<String, Integer> fileList = new HashMap<>();
 		ArrayList<Ref> refHandler;
 
-
+		System.out.println(commits);
+		String branchName = getDefaultBranchName(projectName);
 		for (RevCommit commitSHA : commits) {
+			System.out.println("Commit sha: " + commitSHA.getShortMessage() + " " + commitSHA.getName());
+			git.checkout().setName(commitSHA.getName()).call();
 			Analysis analysis = new Analysis(projectPath);
 			analysis.StartAnalysis();
+			System.out.println("After analysis\n" + analysis.getJavaFiles());
+
 			if(commitNumber % step == 0) {
 				x = commitNumber + step - 1;
 				filePath = "XLSXs" + File.separator +
@@ -452,6 +455,8 @@ public class Main {
 					fis.close();
 				}
 			}
+
+			System.out.println("Before while\n");
 			int lastRowNum = sheet.getLastRowNum() + 1;
 			sha = commitSHA.getName();
 			Repository repository = git.getRepository();
@@ -465,9 +470,12 @@ public class Main {
 				treeWalk.setRecursive(true);
 				int index = 0;
 				ArrayList<JavaFile> javaFiles = analysis.getJavaFiles();
+				System.out.println("Just before while\n");
 				while (treeWalk.next()) {
+					System.out.println("In the while loop" + javaFiles);
 					JavaFile javaFile = javaFiles.get(index);
 					String path = treeWalk.getPathString();
+					System.out.println("In the while loop");
 					if (path.endsWith(".java")) {
 						Row row = sheet.createRow(lastRowNum);
 						fileList.put(path, lastRowNum);
@@ -531,7 +539,7 @@ public class Main {
 					}
 				}
 			} catch (Exception e) {
-				//To do
+				System.out.println("An error occurred in the while loop");
 			}
 			if(commitNumber % 5 == 0) {
 				FileOutputStream fos = new FileOutputStream(filePath);
@@ -540,6 +548,7 @@ public class Main {
 				workbook.close();
 			}
 		}
+		git.checkout().setName(branchName).call();
 		FileOutputStream fos = new FileOutputStream(filePath);
 		workbook.write(fos);
 		fos.close();

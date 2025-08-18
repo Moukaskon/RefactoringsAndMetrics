@@ -15,13 +15,13 @@ public class Analysis {
     }
 
     public void StartAnalysis(){
+        javaFiles.clear();
         ArrayList<String> rootFolders = getRootFolders(projectPath);
         getJavaFiles(projectPath);
         System.out.println("number of files: " + javaFiles.size());
         getMetricsCalculatorMetrics();
         System.out.println(javaFiles);
         System.out.println("Got the metrics!");
-        javaFiles.clear();
     }
 
     /**
