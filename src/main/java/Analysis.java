@@ -33,10 +33,10 @@ public class Analysis {
         //For Linux
         try {
             String home = System.getProperty("user.dir");
-            home += "\\Metrics\\target";
+            home += "\\src\\main\\java";
             if(!System.getProperty("os.name").toLowerCase().contains("win")) {
                 ProcessBuilder pbuilder2 = new ProcessBuilder("bash", "-c", "cd " + home +
-                        "; java -jar -Xmx32g metricsCalculatorLite-1.0-SNAPSHOT-jar-with-dependencies.jar "+ projectPath + " "+thread);
+                        "; java -jar -Xmx32g MetricsCalculatorSnap.jar "+ projectPath + " "+thread);
                 File err2 = new File("err2.txt");
                 pbuilder2.redirectError(err2);
                 Process p2 = pbuilder2.start();
@@ -54,7 +54,10 @@ public class Analysis {
             //For Windows
             else {
                 Process proc1 = Runtime.getRuntime().exec("cmd /c \"cd " + home+ " && "+
-                        "java -jar metricsCalculatorLite-1.0-SNAPSHOT-jar-with-dependencies.jar " +projectPath+ " " +thread+ "\"");
+                        "java -jar MetricsCalculatorSnap.jar " +projectPath+ " " +thread+ "\"");
+
+                System.out.println("cmd /c \"cd " + home+ " && "+
+                        "java -jar MetricsCalculatorSnap.jar " +projectPath+ " " +thread+ "\"");
                 BufferedReader reader1 = new BufferedReader(new InputStreamReader(proc1.getInputStream()));
                 String line1;
                 while ((line1 = reader1.readLine()) != null) {
@@ -63,7 +66,7 @@ public class Analysis {
                 BufferedReader reader2 = new BufferedReader(new InputStreamReader(proc1.getErrorStream()));
                 String line2;
                 while ((line2 = reader2.readLine()) != null) {
-                    System.out.println(line2);
+                   System.out.println(line2);
                 }
             }
         } catch (IOException e) {
@@ -71,7 +74,9 @@ public class Analysis {
         }
 
         try {
-            File myObj = new File("thread-" +thread+ ".txt");
+            File myObj = new File("C:\\Users\\kmoukas\\RefactoringsAndMetrics\\src\\main\\java\\" + thread);
+            System.out.println("Looking for file: " + myObj.getAbsolutePath());
+            System.out.println(myObj.exists() + " " + myObj.getName());
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();
@@ -109,6 +114,7 @@ public class Analysis {
             myReader.close();
             myObj.delete();
         } catch (FileNotFoundException e) {
+            System.out.println("An error occurred. " + thread);
             e.printStackTrace();
         }
     }

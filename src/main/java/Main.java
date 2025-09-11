@@ -413,7 +413,7 @@ public class Main {
 			git.checkout().setName(commitSHA.getName()).call();
 			Analysis analysis = new Analysis(projectPath);
 			analysis.StartAnalysis();
-			System.out.println("After analysis\n" + analysis.getJavaFiles());
+			//System.out.println("After analysis\n" + analysis.getJavaFiles());
 
 			if(commitNumber % step == 0) {
 				x = commitNumber + step - 1;
@@ -470,12 +470,12 @@ public class Main {
 				treeWalk.setRecursive(true);
 				int index = 0;
 				ArrayList<JavaFile> javaFiles = analysis.getJavaFiles();
-				System.out.println("Just before while\n");
+				//System.out.println("Just before while\n");
 				while (treeWalk.next()) {
-					System.out.println("In the while loop" + javaFiles);
+					//System.out.println("In the while loop" + javaFiles);
 					JavaFile javaFile = javaFiles.get(index);
 					String path = treeWalk.getPathString();
-					System.out.println("In the while loop");
+					//System.out.println("In the while loop");
 					if (path.endsWith(".java")) {
 						Row row = sheet.createRow(lastRowNum);
 						fileList.put(path, lastRowNum);
