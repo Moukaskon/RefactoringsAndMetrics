@@ -2,6 +2,7 @@ package main.java;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Analysis {
@@ -80,33 +81,42 @@ public class Analysis {
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();
-                System.out.println(data);
                 if(data.startsWith("FilePath"))
                     continue;
 
                 //save results
-                String[] column = data.split("\t");
+                String[] column = data.split(";");
+                System.out.println(Arrays.toString(column));
                 String filePath;
                 if(Utils.isWindows())
                     filePath = column[0].replace("/", "\\");
                 else
                     filePath = column[0];
 
+                System.out.println("IN THE FILE: " + filePath);
+                System.out.println("Our files now are:" + javaFiles);
+                String filePathClean = filePath.split(";", 2)[0];
                 for(JavaFile jf: javaFiles) {
-                    if(filePath.endsWith(jf.getPath().substring(1))) {
-                        jf.setDSC(Double.parseDouble(column[1]));
-                        jf.setWMC(Double.parseDouble(column[2]));
-                        jf.setDIT(Integer.parseInt(column[3]));
-                        jf.setCC(Double.parseDouble(column[4]));
-                        jf.setLCOM(Double.parseDouble(column[5]));
-                        jf.setMPC(Double.parseDouble(column[6]));
-                        jf.setNOM(Double.parseDouble(column[7]));
-                        jf.setRFC(Double.parseDouble(column[8]));
-                        jf.setDAC(Integer.parseInt(column[9]));
-                        jf.setNOCC(Double.parseDouble(column[10]));
-                        jf.setCBO(Double.parseDouble(column[11]));
-                        jf.setSIZE1(Double.parseDouble(column[12]));
-                        jf.setSIZE2(Double.parseDouble(column[13]));
+                    String jfPath = jf.getPath();
+                    if (jfPath.startsWith("\\") || jfPath.startsWith("/")) {
+                        jfPath = jfPath.substring(1);
+                    }
+                    System.out.println("One more check: " + jfPath);
+                    System.out.println("And it is: " + filePathClean.endsWith(jfPath));
+                    if(filePathClean.endsWith(jfPath)) {
+                        jf.setWMC(Double.parseDouble(column[1]));
+                        jf.setDIT(Integer.parseInt(column[2]));
+                        jf.setNOCC(Double.parseDouble(column[3]));
+                        jf.setCBO(Double.parseDouble(column[4]));
+                        jf.setRFC(Double.parseDouble(column[5]));
+                        jf.setLCOM(Double.parseDouble(column[6]));
+                        // jf.setWMCStar(Double.parseDouble(column[7])); // If you have this field
+                        jf.setNOM(Double.parseDouble(column[8]));
+                        jf.setMPC(Double.parseDouble(column[9]));
+                        jf.setDAC(Integer.parseInt(column[10]));
+                        jf.setSIZE1(Double.parseDouble(column[11]));
+                        jf.setSIZE2(Double.parseDouble(column[12]));
+                        jf.setDSC(Double.parseDouble(column[13]));
                         break;
                     }
                 }
