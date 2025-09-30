@@ -437,16 +437,36 @@ public class Main {
 					header.createCell(4).setCellValue("Refactored");
 					header.createCell(5).setCellValue("RefactoringType");
 					header.createCell(6).setCellValue("Affected Files");
-					header.createCell(7).setCellValue("DIT");
-					header.createCell(8).setCellValue("CC");
-					header.createCell(9).setCellValue("LCOM");
-					header.createCell(10).setCellValue("MPC");
-					header.createCell(11).setCellValue("NOM");
-					header.createCell(12).setCellValue("RFC");
-					header.createCell(13).setCellValue("DAC");
-					header.createCell(14).setCellValue("NOCC");
-					header.createCell(15).setCellValue("CBO");
-					header.createCell(16).setCellValue("SIZE1");
+					header.createCell(7).setCellValue("WMC");
+					header.createCell(8).setCellValue("DIT");
+					header.createCell(9).setCellValue("NOCC");
+					header.createCell(10).setCellValue("CBO");
+					header.createCell(11).setCellValue("RFC");
+					header.createCell(12).setCellValue("LCOM");
+					header.createCell(13).setCellValue("WMC*");
+					header.createCell(14).setCellValue("NOM");
+					header.createCell(15).setCellValue("MPC");
+					header.createCell(16).setCellValue("DAC");
+					header.createCell(17).setCellValue("SIZE1");
+					header.createCell(18).setCellValue("SIZE2");
+					header.createCell(19).setCellValue("DSC");
+					header.createCell(20).setCellValue("NOH");
+					header.createCell(21).setCellValue("ANA");
+					header.createCell(22).setCellValue("DAM");
+					header.createCell(23).setCellValue("DCC");
+					header.createCell(24).setCellValue("CAMC");
+					header.createCell(25).setCellValue("MOA");
+					header.createCell(26).setCellValue("MFA");
+					header.createCell(27).setCellValue("NOP");
+					header.createCell(28).setCellValue("CIS");
+					header.createCell(29).setCellValue("NPM");
+					header.createCell(30).setCellValue("Reusability");
+					header.createCell(31).setCellValue("Flexibility");
+					header.createCell(32).setCellValue("Understandability");
+					header.createCell(33).setCellValue("Functionality");
+					header.createCell(34).setCellValue("Extendibility");
+					header.createCell(35).setCellValue("Effectiveness");
+					header.createCell(36).setCellValue("FanIn");
 				}else {
 					// Open existing file
 					FileInputStream fis = new FileInputStream(file);
@@ -484,16 +504,37 @@ public class Main {
 						row.createCell(2).setCellValue(commitNumber);
 						row.createCell(3).setCellValue(path);
 						row.createCell(4).setCellValue(0);
-						row.createCell(7).setCellValue(javaFile.getDIT());
-						row.createCell(8).setCellValue(javaFile.getCC());
-						row.createCell(9).setCellValue(javaFile.getLCOM());
-						row.createCell(10).setCellValue(javaFile.getMPC());
-						row.createCell(11).setCellValue(javaFile.getNOM());
-						row.createCell(12).setCellValue(javaFile.getRFC());
-						row.createCell(13).setCellValue(javaFile.getDAC());
-						row.createCell(14).setCellValue(javaFile.getNOCC());
-						row.createCell(15).setCellValue(javaFile.getCBO());
-						row.createCell(16).setCellValue(javaFile.getSIZE1());
+						row.createCell(7).setCellValue(javaFile.getWMC());          // WMC
+						row.createCell(8).setCellValue(javaFile.getWMCStar());      // WMC*
+						row.createCell(9).setCellValue(javaFile.getDIT());          // DIT
+						row.createCell(10).setCellValue(javaFile.getNOCC());        // NOCC
+						row.createCell(11).setCellValue(javaFile.getCBO());         // CBO
+						row.createCell(12).setCellValue(javaFile.getRFC());         // RFC
+						row.createCell(13).setCellValue(javaFile.getLCOM());        // LCOM
+						row.createCell(14).setCellValue(javaFile.getNOM());         // NOM
+						row.createCell(15).setCellValue(javaFile.getMPC());         // MPC
+						row.createCell(16).setCellValue(javaFile.getDAC());         // DAC
+						row.createCell(17).setCellValue(javaFile.getSIZE1());       // SIZE1
+						row.createCell(18).setCellValue(javaFile.getSIZE2());       // SIZE2
+						row.createCell(19).setCellValue(javaFile.getDSC());         // DSC
+						row.createCell(20).setCellValue(javaFile.getNOH());         // NOH
+						row.createCell(21).setCellValue(javaFile.getANA());         // ANA
+						row.createCell(22).setCellValue(javaFile.getDAM());         // DAM
+						row.createCell(23).setCellValue(javaFile.getDCC());         // DCC
+						row.createCell(24).setCellValue(javaFile.getCAMC());        // CAMC
+						row.createCell(25).setCellValue(javaFile.getMOA());         // MOA
+						row.createCell(26).setCellValue(javaFile.getMFA());         // MFA
+						row.createCell(27).setCellValue(javaFile.getNOP());         // NOP
+						row.createCell(28).setCellValue(javaFile.getCIS());         // CIS
+						row.createCell(29).setCellValue(javaFile.getNPM());         // NPM
+						row.createCell(30).setCellValue(javaFile.getReusability());         // Reusability
+						row.createCell(31).setCellValue(javaFile.getFlexibility());         // Flexibility
+						row.createCell(32).setCellValue(javaFile.getUnderstandability());   // Understandability
+						row.createCell(33).setCellValue(javaFile.getFunctionality());       // Functionality
+						row.createCell(34).setCellValue(javaFile.getExtendibility());       // Extendibility
+						row.createCell(35).setCellValue(javaFile.getEffectiveness());       // Effectiveness
+						row.createCell(36).setCellValue(javaFile.getFanIn());               // FanIn
+
 						index++;
 						lastRowNum++;
 

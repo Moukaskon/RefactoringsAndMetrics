@@ -75,7 +75,9 @@ public class Analysis {
         }
 
         try {
-            File myObj = new File("C:\\Users\\kmoukas\\RefactoringsAndMetrics\\src\\main\\java\\" + thread);
+            String home = System.getProperty("user.dir");
+            home += "\\src\\main\\java\\";
+            File myObj = new File(home + thread);
             System.out.println("Looking for file: " + myObj.getAbsolutePath());
             System.out.println(myObj.exists() + " " + myObj.getName());
             Scanner myReader = new Scanner(myObj);
@@ -110,13 +112,31 @@ public class Analysis {
                         jf.setCBO(Double.parseDouble(column[4]));
                         jf.setRFC(Double.parseDouble(column[5]));
                         jf.setLCOM(Double.parseDouble(column[6]));
-                        // jf.setWMCStar(Double.parseDouble(column[7])); // If you have this field
+                        jf.setWMCStar(Double.parseDouble(column[7]));
                         jf.setNOM(Double.parseDouble(column[8]));
                         jf.setMPC(Double.parseDouble(column[9]));
                         jf.setDAC(Integer.parseInt(column[10]));
                         jf.setSIZE1(Double.parseDouble(column[11]));
                         jf.setSIZE2(Double.parseDouble(column[12]));
                         jf.setDSC(Double.parseDouble(column[13]));
+                        jf.setNOH(Double.parseDouble(column[14]));
+                        jf.setANA(Double.parseDouble(column[15]));
+                        jf.setDAM(Double.parseDouble(column[16]));
+                        jf.setDCC(Double.parseDouble(column[17]));
+                        jf.setCAMC(Double.parseDouble(column[18]));
+                        jf.setMOA(Double.parseDouble(column[19]));
+                        jf.setMFA(Double.parseDouble(column[20]));
+                        jf.setNOP(Double.parseDouble(column[21]));
+                        jf.setCIS(Double.parseDouble(column[22]));
+                        jf.setNPM(Double.parseDouble(column[23]));
+                        jf.setReusability(Double.parseDouble(column[24]));
+                        jf.setFlexibility(Double.parseDouble(column[25]));
+                        jf.setUnderstandability(Double.parseDouble(column[26]));
+                        jf.setFunctionality(Double.parseDouble(column[27]));
+                        jf.setExtendibility(Double.parseDouble(column[28]));
+                        jf.setEffectiveness(Double.parseDouble(column[29]));
+                        jf.setFanIn(Double.parseDouble(column[30]));
+
                         break;
                     }
                 }
