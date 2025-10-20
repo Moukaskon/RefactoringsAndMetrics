@@ -96,7 +96,7 @@ public class Analysis {
                     filePath = column[0];
 
                 System.out.println("IN THE FILE: " + filePath);
-                System.out.println("Our files now are:" + javaFiles);
+//                System.out.println("Our files now are:" + javaFiles);
                 String filePathClean = filePath.split(";", 2)[0];
                 for(JavaFile jf: javaFiles) {
                     String jfPath = jf.getPath();

@@ -504,36 +504,36 @@ public class Main {
 						row.createCell(2).setCellValue(commitNumber);
 						row.createCell(3).setCellValue(path);
 						row.createCell(4).setCellValue(0);
-						row.createCell(7).setCellValue(javaFile.getWMC());          // WMC
-						row.createCell(8).setCellValue(javaFile.getWMCStar());      // WMC*
-						row.createCell(9).setCellValue(javaFile.getDIT());          // DIT
-						row.createCell(10).setCellValue(javaFile.getNOCC());        // NOCC
-						row.createCell(11).setCellValue(javaFile.getCBO());         // CBO
-						row.createCell(12).setCellValue(javaFile.getRFC());         // RFC
-						row.createCell(13).setCellValue(javaFile.getLCOM());        // LCOM
-						row.createCell(14).setCellValue(javaFile.getNOM());         // NOM
-						row.createCell(15).setCellValue(javaFile.getMPC());         // MPC
-						row.createCell(16).setCellValue(javaFile.getDAC());         // DAC
-						row.createCell(17).setCellValue(javaFile.getSIZE1());       // SIZE1
-						row.createCell(18).setCellValue(javaFile.getSIZE2());       // SIZE2
-						row.createCell(19).setCellValue(javaFile.getDSC());         // DSC
-						row.createCell(20).setCellValue(javaFile.getNOH());         // NOH
-						row.createCell(21).setCellValue(javaFile.getANA());         // ANA
-						row.createCell(22).setCellValue(javaFile.getDAM());         // DAM
-						row.createCell(23).setCellValue(javaFile.getDCC());         // DCC
-						row.createCell(24).setCellValue(javaFile.getCAMC());        // CAMC
-						row.createCell(25).setCellValue(javaFile.getMOA());         // MOA
-						row.createCell(26).setCellValue(javaFile.getMFA());         // MFA
-						row.createCell(27).setCellValue(javaFile.getNOP());         // NOP
-						row.createCell(28).setCellValue(javaFile.getCIS());         // CIS
-						row.createCell(29).setCellValue(javaFile.getNPM());         // NPM
-						row.createCell(30).setCellValue(javaFile.getReusability());         // Reusability
-						row.createCell(31).setCellValue(javaFile.getFlexibility());         // Flexibility
-						row.createCell(32).setCellValue(javaFile.getUnderstandability());   // Understandability
-						row.createCell(33).setCellValue(javaFile.getFunctionality());       // Functionality
-						row.createCell(34).setCellValue(javaFile.getExtendibility());       // Extendibility
-						row.createCell(35).setCellValue(javaFile.getEffectiveness());       // Effectiveness
-						row.createCell(36).setCellValue(javaFile.getFanIn());               // FanIn
+						row.createCell(7).setCellValue(javaFile.getWMC());
+						row.createCell(8).setCellValue(javaFile.getDIT());
+						row.createCell(9).setCellValue(javaFile.getNOCC());
+						row.createCell(10).setCellValue(javaFile.getCBO());
+						row.createCell(11).setCellValue(javaFile.getRFC());
+						row.createCell(12).setCellValue(javaFile.getLCOM());
+						row.createCell(13).setCellValue(javaFile.getWMCStar());
+						row.createCell(14).setCellValue(javaFile.getNOM());
+						row.createCell(15).setCellValue(javaFile.getMPC());
+						row.createCell(16).setCellValue(javaFile.getDAC());
+						row.createCell(17).setCellValue(javaFile.getSIZE1());
+						row.createCell(18).setCellValue(javaFile.getSIZE2());
+						row.createCell(19).setCellValue(javaFile.getDSC());
+						row.createCell(20).setCellValue(javaFile.getNOH());
+						row.createCell(21).setCellValue(javaFile.getANA());
+						row.createCell(22).setCellValue(javaFile.getDAM());
+						row.createCell(23).setCellValue(javaFile.getDCC());
+						row.createCell(24).setCellValue(javaFile.getCAMC());
+						row.createCell(25).setCellValue(javaFile.getMOA());
+						row.createCell(26).setCellValue(javaFile.getMFA());
+						row.createCell(27).setCellValue(javaFile.getNOP());
+						row.createCell(28).setCellValue(javaFile.getCIS());
+						row.createCell(29).setCellValue(javaFile.getNPM());
+						row.createCell(30).setCellValue(javaFile.getReusability());
+						row.createCell(31).setCellValue(javaFile.getFlexibility());
+						row.createCell(32).setCellValue(javaFile.getUnderstandability());
+						row.createCell(33).setCellValue(javaFile.getFunctionality());
+						row.createCell(34).setCellValue(javaFile.getExtendibility());
+						row.createCell(35).setCellValue(javaFile.getEffectiveness());
+						row.createCell(36).setCellValue(javaFile.getFanIn());
 
 						index++;
 						lastRowNum++;
