@@ -96,9 +96,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>
-                                Main
-                            </mainClass>
+                            <mainClass>refsandmetrs</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
