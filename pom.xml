@@ -4,17 +4,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>gr.nikos</groupId>
+    <groupId>gr.teomaik</groupId>
     <artifactId>refactoringandmetrics</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <modules>
-        <module>Metrics</module>
-    </modules>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+        <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
     </properties>
 
     <dependencies>
@@ -82,11 +80,28 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Define plugin versions in pluginManagement for consistency -->
+                <plugin>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>${maven-assembly-plugin.version}</version>
+                </plugin>
+                <!-- Add maven-compiler-plugin version if not already inherited by default -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version> <!-- Or a later version -->
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <!-- Version inherited from pluginManagement -->
                 <executions>
                     <execution>
+                        <id>make-executable-jar</id> <!-- Give the execution an ID -->
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
@@ -96,9 +111,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>
-                                Main
-                            </mainClass>
+                            <!-- CRITICAL CHANGE: Use the fully qualified name -->
+                            <mainClass>main.java.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
