@@ -39,6 +39,7 @@ public class Analysis {
                 ProcessBuilder pbuilder2 = new ProcessBuilder("bash", "-c", "cd " + home +
                         "; java -jar -Xmx32g MetricsCalculatorSnap.jar "+ projectPath + " "+thread);
                 File err2 = new File("err2.txt");
+                System.out.println("Running the jar file ");
                 pbuilder2.redirectError(err2);
                 Process p2 = pbuilder2.start();
                 BufferedReader reader2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
@@ -59,19 +60,38 @@ public class Analysis {
 
                 System.out.println("cmd /c \"cd " + home+ " && "+
                         "java -jar MetricsCalculatorSnap.jar " +projectPath+ " " +thread+ "\"");
-                BufferedReader reader1 = new BufferedReader(new InputStreamReader(proc1.getInputStream()));
-                String line1;
-                while ((line1 = reader1.readLine()) != null) {
-                    System.out.println(line1);
-                }
-                BufferedReader reader2 = new BufferedReader(new InputStreamReader(proc1.getErrorStream()));
-                String line2;
-                while ((line2 = reader2.readLine()) != null) {
-                   System.out.println(line2);
-                }
+
+                Thread stdoutThread = new Thread(() -> {
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(proc1.getInputStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            System.out.println(line);
+                        }
+                    } catch (IOException e) { e.printStackTrace(); }
+                });
+
+                Thread stderrThread = new Thread(() -> {
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(proc1.getErrorStream()))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            System.err.println(line);
+                        }
+                    } catch (IOException e) { e.printStackTrace(); }
+                });
+
+                stdoutThread.start();
+                stderrThread.start();
+
+                proc1.waitFor();
+
+                stdoutThread.join();
+                stderrThread.join();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
         try {
@@ -103,8 +123,8 @@ public class Analysis {
                     if (jfPath.startsWith("\\") || jfPath.startsWith("/")) {
                         jfPath = jfPath.substring(1);
                     }
-                    System.out.println("One more check: " + jfPath);
-                    System.out.println("And it is: " + filePathClean.endsWith(jfPath));
+//                    System.out.println("One more check: " + jfPath);
+//                    System.out.println("And it is: " + filePathClean.endsWith(jfPath));
                     if(filePathClean.endsWith(jfPath)) {
                         jf.setWMC(Double.parseDouble(column[1]));
                         jf.setDIT(Integer.parseInt(column[2]));

@@ -30,7 +30,7 @@ public class Main {
 		// Get url and name
 		ArrayList<String> csvs = new ArrayList<>();
 		ArrayList<String> projects = new ArrayList<>();
-		projects.add("https://github.com/teomaik/DeRec-GEA.git");
+//		projects.add("https://github.com/teomaik/DeRec-GEA.git");
 //		projects.add("https://github.com/jagrosh/MusicBot");
 //		projects.add("https://github.com/apache/maven-archetype");
 //		projects.add("https://github.com/apache/commons-io");
@@ -349,6 +349,12 @@ public class Main {
 
 	//LETS TRY XLSX
 
+	public static String normalizePath(String path) {
+		// Remove leading slashes, convert all to forward slashes, lowercase
+		String norm = path.replace("\\", "/").replaceAll("^/+", "").toLowerCase();
+		return norm;
+	}
+
 	public static void writeXlsxText(String projectName, int step, String gitURL, String projectPath) throws IOException, GitAPIException {
 
 		int commitNumber = 0;
@@ -401,7 +407,12 @@ public class Main {
 
 		Git git = Git.open(new File(projectPath));
 
-		Iterable<RevCommit> commits = git.log().call();
+		Iterable<RevCommit> commitsIterable = git.log().call();
+		List<RevCommit> commits = new ArrayList<>();
+		for (RevCommit commit : commitsIterable) {
+			commits.add(commit);
+		}
+		Collections.reverse(commits);
 		String sha;
 		HashMap<String, Integer> fileList = new HashMap<>();
 		ArrayList<Ref> refHandler;
@@ -414,6 +425,13 @@ public class Main {
 			Analysis analysis = new Analysis(projectPath);
 			analysis.StartAnalysis();
 			//System.out.println("After analysis\n" + analysis.getJavaFiles());
+			ArrayList<JavaFile> javaFiles = analysis.getJavaFiles();
+			HashMap<String, JavaFile> pathToJavaFile = new HashMap<>();
+			for (JavaFile jf : javaFiles) {
+				String normPath = normalizePath(jf.getPath());
+				pathToJavaFile.put(normPath, jf);
+			}
+
 
 			if(commitNumber % step == 0) {
 				x = commitNumber + step - 1;
@@ -489,57 +507,60 @@ public class Main {
 				treeWalk.addTree(tree);
 				treeWalk.setRecursive(true);
 				int index = 0;
-				ArrayList<JavaFile> javaFiles = analysis.getJavaFiles();
 				//System.out.println("Just before while\n");
 				while (treeWalk.next()) {
-					//System.out.println("In the while loop" + javaFiles);
-					JavaFile javaFile = javaFiles.get(index);
-					String path = treeWalk.getPathString();
-					//System.out.println("In the while loop");
-					if (path.endsWith(".java")) {
-						Row row = sheet.createRow(lastRowNum);
-						fileList.put(path, lastRowNum);
-						row.createCell(0).setCellValue(projectName);
-						row.createCell(1).setCellValue(sha);
-						row.createCell(2).setCellValue(commitNumber);
-						row.createCell(3).setCellValue(path);
-						row.createCell(4).setCellValue(0);
-						row.createCell(7).setCellValue(javaFile.getWMC());
-						row.createCell(8).setCellValue(javaFile.getDIT());
-						row.createCell(9).setCellValue(javaFile.getNOCC());
-						row.createCell(10).setCellValue(javaFile.getCBO());
-						row.createCell(11).setCellValue(javaFile.getRFC());
-						row.createCell(12).setCellValue(javaFile.getLCOM());
-						row.createCell(13).setCellValue(javaFile.getWMCStar());
-						row.createCell(14).setCellValue(javaFile.getNOM());
-						row.createCell(15).setCellValue(javaFile.getMPC());
-						row.createCell(16).setCellValue(javaFile.getDAC());
-						row.createCell(17).setCellValue(javaFile.getSIZE1());
-						row.createCell(18).setCellValue(javaFile.getSIZE2());
-						row.createCell(19).setCellValue(javaFile.getDSC());
-						row.createCell(20).setCellValue(javaFile.getNOH());
-						row.createCell(21).setCellValue(javaFile.getANA());
-						row.createCell(22).setCellValue(javaFile.getDAM());
-						row.createCell(23).setCellValue(javaFile.getDCC());
-						row.createCell(24).setCellValue(javaFile.getCAMC());
-						row.createCell(25).setCellValue(javaFile.getMOA());
-						row.createCell(26).setCellValue(javaFile.getMFA());
-						row.createCell(27).setCellValue(javaFile.getNOP());
-						row.createCell(28).setCellValue(javaFile.getCIS());
-						row.createCell(29).setCellValue(javaFile.getNPM());
-						row.createCell(30).setCellValue(javaFile.getReusability());
-						row.createCell(31).setCellValue(javaFile.getFlexibility());
-						row.createCell(32).setCellValue(javaFile.getUnderstandability());
-						row.createCell(33).setCellValue(javaFile.getFunctionality());
-						row.createCell(34).setCellValue(javaFile.getExtendibility());
-						row.createCell(35).setCellValue(javaFile.getEffectiveness());
-						row.createCell(36).setCellValue(javaFile.getFanIn());
-
-						index++;
-						lastRowNum++;
-
-						handlerListTest.put(path, new FileHandler());
+					String path = normalizePath(treeWalk.getPathString());
+					if (!path.endsWith(".java")) continue;
+					JavaFile javaFile = pathToJavaFile.get(path);
+					if (javaFile == null) {
+						System.out.println("No JavaFile found for: " + path);
+						continue;
 					}
+					// System.out.println("In the while loop" + javaFiles);
+					// String path = treeWalk.getPathString();
+					// System.out.println("In the while loop");
+					Row row = sheet.createRow(lastRowNum);
+					fileList.put(path, lastRowNum);
+					row.createCell(0).setCellValue(projectName);
+					row.createCell(1).setCellValue(sha);
+					row.createCell(2).setCellValue(commitNumber);
+					row.createCell(3).setCellValue(path);
+					row.createCell(4).setCellValue(0);
+					row.createCell(7).setCellValue(javaFile.getWMC());
+					row.createCell(8).setCellValue(javaFile.getDIT());
+					row.createCell(9).setCellValue(javaFile.getNOCC());
+					row.createCell(10).setCellValue(javaFile.getCBO());
+					row.createCell(11).setCellValue(javaFile.getRFC());
+					row.createCell(12).setCellValue(javaFile.getLCOM());
+					row.createCell(13).setCellValue(javaFile.getWMCStar());
+					row.createCell(14).setCellValue(javaFile.getNOM());
+					row.createCell(15).setCellValue(javaFile.getMPC());
+					row.createCell(16).setCellValue(javaFile.getDAC());
+					row.createCell(17).setCellValue(javaFile.getSIZE1());
+					row.createCell(18).setCellValue(javaFile.getSIZE2());
+					row.createCell(19).setCellValue(javaFile.getDSC());
+					row.createCell(20).setCellValue(javaFile.getNOH());
+					row.createCell(21).setCellValue(javaFile.getANA());
+					row.createCell(22).setCellValue(javaFile.getDAM());
+					row.createCell(23).setCellValue(javaFile.getDCC());
+					row.createCell(24).setCellValue(javaFile.getCAMC());
+					row.createCell(25).setCellValue(javaFile.getMOA());
+					row.createCell(26).setCellValue(javaFile.getMFA());
+					row.createCell(27).setCellValue(javaFile.getNOP());
+					row.createCell(28).setCellValue(javaFile.getCIS());
+					row.createCell(29).setCellValue(javaFile.getNPM());
+					row.createCell(30).setCellValue(javaFile.getReusability());
+					row.createCell(31).setCellValue(javaFile.getFlexibility());
+					row.createCell(32).setCellValue(javaFile.getUnderstandability());
+					row.createCell(33).setCellValue(javaFile.getFunctionality());
+					row.createCell(34).setCellValue(javaFile.getExtendibility());
+					row.createCell(35).setCellValue(javaFile.getEffectiveness());
+					row.createCell(36).setCellValue(javaFile.getFanIn());
+
+					lastRowNum++;
+
+					handlerListTest.put(path, new FileHandler());
+
 				}
 				System.out.println("Updating commit number");
 				commitNumber++;
@@ -554,7 +575,8 @@ public class Main {
 					for (int j = 0; j < commitBeforeRef.size(); j++) {
 //					System.out.println("Is " + commitBeforeRef.get(j) + " in fileList: " + fileList.containsKey(commitBeforeRef.get(j)) +
 //							" Keys: " + fileList.get(commitBeforeRef.get(j)));
-						String fileName = commitBeforeRef.get(j);
+						String fileNameTemp = commitBeforeRef.get(j);
+						String fileName = normalizePath(fileNameTemp);
 						System.out.println(fileList.containsKey(fileName) + " " + fileName + " " + fileList);
 						if (fileList.containsKey(fileName)) {
 							int rowIndex = fileList.get(fileName);
