@@ -45,12 +45,12 @@ public class Analysis {
                 BufferedReader reader2 = new BufferedReader(new InputStreamReader(p2.getInputStream()));
                 String line1;
                 while ((line1 = reader2.readLine()) != null) {
-                    System.out.println(line1);
+//                    System.out.println(line1);
                 }
                 BufferedReader reader3 = new BufferedReader(new InputStreamReader(p2.getErrorStream()));
                 String line2;
                 while ((line2 = reader3.readLine()) != null) {
-                    System.out.println(line2);
+//                    System.out.println(line2);
                 }
             }
             //For Windows
@@ -98,8 +98,8 @@ public class Analysis {
             String home = System.getProperty("user.dir");
             home += "\\src\\main\\java\\";
             File myObj = new File(home + thread);
-            System.out.println("Looking for file: " + myObj.getAbsolutePath());
-            System.out.println(myObj.exists() + " " + myObj.getName());
+//            System.out.println("Looking for file: " + myObj.getAbsolutePath());
+//            System.out.println(myObj.exists() + " " + myObj.getName());
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()) {
                 String data = myReader.nextLine();
@@ -108,14 +108,14 @@ public class Analysis {
 
                 //save results
                 String[] column = data.split(";");
-                System.out.println(Arrays.toString(column));
+//                System.out.println(Arrays.toString(column));
                 String filePath;
                 if(Utils.isWindows())
                     filePath = column[0].replace("/", "\\");
                 else
                     filePath = column[0];
 
-                System.out.println("IN THE FILE: " + filePath);
+//                System.out.println("IN THE FILE: " + filePath);
 //                System.out.println("Our files now are:" + javaFiles);
                 String filePathClean = filePath.split(";", 2)[0];
                 for(JavaFile jf: javaFiles) {
