@@ -13,6 +13,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -67,16 +68,19 @@ public class Main {
 		System.out.println("Number of Command Line Argument = " + args.length);
 		int numOfCommits = 0;
 
-		System.out.println("Command Line Argument" + i + "is" + args[i]);
+		System.out.println("Command Line Argument length: " + args.length);
 		projects.add(args[0]);
 		String startingCommit = null;
-		if(args.length > 1) {
+		int startingCommitNumber = 0;
+		if (args.length == 2) {
 			startingCommit = args[1];
+		} else if (args.length == 3) {
+			startingCommitNumber = Integer.parseInt(args[2]);
 		}
 
 		try {
 			for (String prj : projects) {
-				csvs.add(runAnalysis(prj, startingCommit));
+				csvs.add(runAnalysis(prj, startingCommit, startingCommitNumber));
 			}
 		} catch (Exception e) {
 			csvs.add("error during exec: \n" + e);
@@ -124,7 +128,7 @@ public class Main {
 	}
 
 
-	public static String runAnalysis(String gitURL, String startingCommit) throws Exception {
+	public static String runAnalysis(String gitURL, String startingCommit, int startingCommitNumber) throws Exception {
 		// Get url and name
 		gitURL = gitURL.replace(".git", "");
 		String projectName = "Allprojects" + File.separator + gitURL.split("/")[gitURL.split("/").length - 1];
@@ -139,7 +143,7 @@ public class Main {
 
 		List<CommitObj> commitIds = new ArrayList<CommitObj>();
 
-		writeXlsxText(projectName, 5, gitURL, projectPath, startingCommit);
+		writeXlsxText(projectName, 5, gitURL, projectPath, startingCommit, startingCommitNumber);
 
 		int commitStep = 5;
 
@@ -363,9 +367,10 @@ public class Main {
 		return norm;
 	}
 
-	public static void writeXlsxText(String projectName, int step, String gitURL, String projectPath, String startCommitSHA) throws IOException, GitAPIException {
+	public static void writeXlsxText(String projectName, int step, String gitURL, String projectPath, String startCommitSHA, int commitNumberArg) throws IOException, GitAPIException {
 
-		int commitNumber = 0;
+		int commitNumber = commitNumberArg;
+
 		GitService gitService = new GitServiceImpl();
 
 		try {
@@ -376,26 +381,38 @@ public class Main {
 
 		Git git = Git.open(new File(projectPath));
 
-		Iterable<RevCommit> commitsIterable = git.log().call();
-		List<RevCommit> commits = new ArrayList<>();
-		for (RevCommit commit : commitsIterable) {
-			commits.add(commit);
-		}
-		Collections.reverse(commits);
+		Repository repository = git.getRepository();
+
+		Iterable<RevCommit> commitsIterable;
+
+		boolean reverseCommits = false;
 
 		if (startCommitSHA != null) {
-			boolean found = false;
-			for (int i = 0; i < commits.size(); i++) {
-				if (commits.get(i).getName().equals(startCommitSHA)) {
-					commits = commits.subList(i, commits.size());
-					found = true;
-					break;
-				}
+
+			AnyObjectId startCommit = repository.resolve(startCommitSHA);
+			if (startCommit == null) {
+				throw new IllegalArgumentException("Invalid start commit: " + startCommitSHA);
 			}
-			if (!found) {
-				System.out.println("Starting commit SHA not found, starting from first commit.");
-			}
+
+			AnyObjectId headCommit = repository.resolve("HEAD");
+
+			commitsIterable = git.log()
+					.addRange(startCommit, headCommit)
+					.call();
+		} else {
+			commitsIterable = git.log().call();
+			reverseCommits = true;
 		}
+
+		List<RevCommit> commits = new ArrayList<>();
+		for (RevCommit c : commitsIterable) {
+			commits.add(c);
+		}
+
+		if (reverseCommits) {
+			Collections.reverse(commits);
+		}
+
 
 		String sha;
 		HashMap<String, Integer> fileList = new HashMap<>();
@@ -412,276 +429,251 @@ public class Main {
 		RevCommit previousCommit = null;
 		Row previousSummaryRow = null;
 
-		while(true) {
-			if (commitNumber % step == 0) {
-				if (workbook != null) {
-					try (FileOutputStream fos = new FileOutputStream(filePath)) {
-						workbook.write(fos);
-					}
-					workbook.close();
-				}
-
-				batchStart = commitNumber;
-				int batchEnd = batchStart + step - 1;
-				filePath = "XLSXs" + File.separator +
-						projectName.replace("Allprojects" + File.separator, "") +
-						batchStart + " - " + batchEnd + "_refactoring_data.xlsx";
-
-				workbook = new XSSFWorkbook();
-				sheet = workbook.createSheet("Refactorings");
-
-				// Write header
-				Row header = sheet.createRow(0);
-				header.createCell(0).setCellValue("projectName");
-				header.createCell(1).setCellValue("SHA");
-				header.createCell(2).setCellValue("CommitNumber");
-				header.createCell(3).setCellValue("Files");
-				header.createCell(4).setCellValue("Refactored");
-				header.createCell(5).setCellValue("RefactoringType");
-				header.createCell(6).setCellValue("Affected Files");
-				header.createCell(7).setCellValue("WMC");
-				header.createCell(8).setCellValue("DIT");
-				header.createCell(9).setCellValue("NOCC");
-				header.createCell(10).setCellValue("CBO");
-				header.createCell(11).setCellValue("RFC");
-				header.createCell(12).setCellValue("LCOM");
-				header.createCell(13).setCellValue("WMC*");
-				header.createCell(14).setCellValue("NOM");
-				header.createCell(15).setCellValue("MPC");
-				header.createCell(16).setCellValue("DAC");
-				header.createCell(17).setCellValue("SIZE1");
-				header.createCell(18).setCellValue("SIZE2");
-				header.createCell(19).setCellValue("DSC");
-				header.createCell(20).setCellValue("NOH");
-				header.createCell(21).setCellValue("ANA");
-				header.createCell(22).setCellValue("DAM");
-				header.createCell(23).setCellValue("DCC");
-				header.createCell(24).setCellValue("CAMC");
-				header.createCell(25).setCellValue("MOA");
-				header.createCell(26).setCellValue("MFA");
-				header.createCell(27).setCellValue("NOP");
-				header.createCell(28).setCellValue("CIS");
-				header.createCell(29).setCellValue("NPM");
-				header.createCell(30).setCellValue("Reusability");
-				header.createCell(31).setCellValue("Flexibility");
-				header.createCell(32).setCellValue("Understandability");
-				header.createCell(33).setCellValue("Functionality");
-				header.createCell(34).setCellValue("Extendibility");
-				header.createCell(35).setCellValue("Effectiveness");
-				header.createCell(36).setCellValue("FanIn");
-				header.createCell(37).setCellValue("AllChangedFiles");
-			}
-
-			git.checkout().setName(commitSHA.getName()).call();
-			// New code
-			Repository repository = git.getRepository();
-			RevWalk revWalk = new RevWalk(repository);
-			RevCommit currentCommit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
-
-			Analysis analysis = new Analysis(projectPath);
-			analysis.StartAnalysis();
-			ArrayList<JavaFile> javaFiles = analysis.getJavaFiles();
-			HashMap<String, JavaFile> pathToJavaFile = new HashMap<>();
-			for (JavaFile jf : javaFiles) {
-				String normPath = normalizePath(jf.getPath());
-				pathToJavaFile.put(normPath, jf);
-			}
-
-			if (previousCommit != null && previousSummaryRow != null) {
-
-				List<String> changedFiles = new ArrayList<>();
-
-				try (ObjectReader reader = repository.newObjectReader()) {
-
-					CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-					CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
-
-					oldTreeIter.reset(reader, previousCommit.getTree());
-					newTreeIter.reset(reader, currentCommit.getTree());
-
-					DiffFormatter diffFormatter =
-							new DiffFormatter(DisabledOutputStream.INSTANCE);
-					diffFormatter.setRepository(repository);
-
-					List<DiffEntry> diffs =
-							diffFormatter.scan(oldTreeIter, newTreeIter);
-
-					for (DiffEntry entry : diffs) {
-						String path = entry.getNewPath();
-						if (path.endsWith(".java")) {
-							changedFiles.add(normalizePath(path));
+		while (true) {
+			try {
+				if (workbook == null || commitNumber % step == 0) {
+					if (workbook != null) {
+						try (FileOutputStream fos = new FileOutputStream(filePath)) {
+							workbook.write(fos);
 						}
+						workbook.close();
 					}
-				}
 
-				if (!changedFiles.isEmpty()) {
-					previousSummaryRow
-							.createCell(37)
-							.setCellValue(String.join(";", changedFiles));
-				}
-			}
+					batchStart = commitNumber;
+					int batchEnd = batchStart + step - 1;
+					String cleanProjectName = projectName.replace("Allprojects" + File.separator, "");
 
-			int summaryRowIndex = sheet.getLastRowNum() + 1;
-			Row summaryRow = sheet.createRow(summaryRowIndex);
-
-			summaryRow.createCell(0).setCellValue(projectName);
-			summaryRow.createCell(1).setCellValue(commitSHA.getName());
-			summaryRow.createCell(2).setCellValue(commitNumber);
-
-			fileList.clear();
-
-			sha = commitSHA.getName();
-			// Old code
-//			Repository repository = git.getRepository();
-//			RevWalk revWalk = new RevWalk(repository);
-//			RevCommit commit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
-			RevTree tree = currentCommit.getTree();
-			HashMap<String, FileHandler> handlerListTest = new HashMap<>();
-
-			int lastRowNum = summaryRowIndex + 1;
-
-			try (TreeWalk treeWalk = new TreeWalk(repository)) {
-				treeWalk.addTree(tree);
-				treeWalk.setRecursive(true);
-				while (treeWalk.next()) {
-					String path = normalizePath(treeWalk.getPathString());
-					if (!path.endsWith(".java")) continue;
-					JavaFile javaFile = pathToJavaFile.get(path);
-					if (javaFile == null) {
-						System.out.println("No JavaFile found for: " + path);
-						continue;
+					File projectDir = new File("XLSXs" + File.separator + cleanProjectName);
+					if (!projectDir.exists()) {
+						projectDir.mkdirs();
 					}
-					Row row = sheet.createRow(lastRowNum);
-					fileList.put(path, lastRowNum);
-					row.createCell(0).setCellValue(projectName);
-					row.createCell(1).setCellValue(sha);
-					row.createCell(2).setCellValue(commitNumber);
-					row.createCell(3).setCellValue(path);
-					row.createCell(4).setCellValue(0);
-					row.createCell(7).setCellValue(javaFile.getWMC());
-					row.createCell(8).setCellValue(javaFile.getDIT());
-					row.createCell(9).setCellValue(javaFile.getNOCC());
-					row.createCell(10).setCellValue(javaFile.getCBO());
-					row.createCell(11).setCellValue(javaFile.getRFC());
-					row.createCell(12).setCellValue(javaFile.getLCOM());
-					row.createCell(13).setCellValue(javaFile.getWMCStar());
-					row.createCell(14).setCellValue(javaFile.getNOM());
-					row.createCell(15).setCellValue(javaFile.getMPC());
-					row.createCell(16).setCellValue(javaFile.getDAC());
-					row.createCell(17).setCellValue(javaFile.getSIZE1());
-					row.createCell(18).setCellValue(javaFile.getSIZE2());
-					row.createCell(19).setCellValue(javaFile.getDSC());
-					row.createCell(20).setCellValue(javaFile.getNOH());
-					row.createCell(21).setCellValue(javaFile.getANA());
-					row.createCell(22).setCellValue(javaFile.getDAM());
-					row.createCell(23).setCellValue(javaFile.getDCC());
-					row.createCell(24).setCellValue(javaFile.getCAMC());
-					row.createCell(25).setCellValue(javaFile.getMOA());
-					row.createCell(26).setCellValue(javaFile.getMFA());
-					row.createCell(27).setCellValue(javaFile.getNOP());
-					row.createCell(28).setCellValue(javaFile.getCIS());
-					row.createCell(29).setCellValue(javaFile.getNPM());
-					row.createCell(30).setCellValue(javaFile.getReusability());
-					row.createCell(31).setCellValue(javaFile.getFlexibility());
-					row.createCell(32).setCellValue(javaFile.getUnderstandability());
-					row.createCell(33).setCellValue(javaFile.getFunctionality());
-					row.createCell(34).setCellValue(javaFile.getExtendibility());
-					row.createCell(35).setCellValue(javaFile.getEffectiveness());
-					row.createCell(36).setCellValue(javaFile.getFanIn());
 
-					lastRowNum++;
-					handlerListTest.put(path, new FileHandler());
-				}
-				previousCommit = currentCommit;
-				previousSummaryRow = summaryRow;
-				commitNumber++;
-				if (!commitIter.hasNext()) {
-					break;
-				}
-				commitSHA = commitIter.next();
+					filePath = projectDir.getPath() + File.separator +
+							batchStart + " - " + batchEnd + "_refactoring_data.xlsx";
 
-				refHandler = detectRefs(commitSHA.getName(), repository);
-				if (refHandler != null && !refHandler.isEmpty()) {
-					for (int i = 0; i < refHandler.size(); i++) {
-						ArrayList<String> commitBeforeRef = refHandler.get(i).getFilesBeforeRef();
-						ArrayList<String> commitAfterRef = refHandler.get(i).getFilesAfterRef();
-						String refName = refHandler.get(i).getRefactoringName();
-						for (int j = 0; j < commitBeforeRef.size(); j++) {
-							String fileNameTemp = commitBeforeRef.get(j);
-							String fileName = normalizePath(fileNameTemp);
-							if (fileList.containsKey(fileName)) {
-								int rowIndex = fileList.get(fileName);
-								Row row = sheet.getRow(rowIndex);
-								row.getCell(4).setCellValue(1);
-								Cell cellRefName = row.getCell(5);
-								if (cellRefName == null) {
-									cellRefName = row.createCell(5);
-								}
-								String oldValue = cellRefName.getStringCellValue();
-								if (oldValue == null) oldValue = "";
-								cellRefName.setCellValue(refName + ";" + oldValue);
-								String allFilesInvolved = "";
-								for (String fileInvolved : commitAfterRef) {
-									allFilesInvolved += fileInvolved + ";";
-								}
-								Cell cellInvolved = row.getCell(6);
-								if (cellInvolved == null) {
-									cellInvolved = row.createCell(6);
-								}
-								String oldValue2 = cellInvolved.getStringCellValue();
-								if (oldValue2 == null) oldValue2 = "";
-								cellInvolved.setCellValue(refName + ";" + oldValue2);
-								cellInvolved.setCellValue(allFilesInvolved + " | " + cellInvolved.getStringCellValue());
+					workbook = new XSSFWorkbook();
+					sheet = workbook.createSheet("Refactorings");
+
+					// Write header
+					Row header = sheet.createRow(0);
+					header.createCell(0).setCellValue("projectName");
+					header.createCell(1).setCellValue("SHA");
+					header.createCell(2).setCellValue("CommitNumber");
+					header.createCell(3).setCellValue("Files");
+					header.createCell(4).setCellValue("Refactored");
+					header.createCell(5).setCellValue("RefactoringType");
+					header.createCell(6).setCellValue("Affected Files");
+					header.createCell(7).setCellValue("WMC");
+					header.createCell(8).setCellValue("DIT");
+					header.createCell(9).setCellValue("NOCC");
+					header.createCell(10).setCellValue("CBO");
+					header.createCell(11).setCellValue("RFC");
+					header.createCell(12).setCellValue("LCOM");
+					header.createCell(13).setCellValue("WMC*");
+					header.createCell(14).setCellValue("NOM");
+					header.createCell(15).setCellValue("MPC");
+					header.createCell(16).setCellValue("DAC");
+					header.createCell(17).setCellValue("SIZE1");
+					header.createCell(18).setCellValue("SIZE2");
+					header.createCell(19).setCellValue("DSC");
+					header.createCell(20).setCellValue("NOH");
+					header.createCell(21).setCellValue("ANA");
+					header.createCell(22).setCellValue("DAM");
+					header.createCell(23).setCellValue("DCC");
+					header.createCell(24).setCellValue("CAMC");
+					header.createCell(25).setCellValue("MOA");
+					header.createCell(26).setCellValue("MFA");
+					header.createCell(27).setCellValue("NOP");
+					header.createCell(28).setCellValue("CIS");
+					header.createCell(29).setCellValue("NPM");
+					header.createCell(30).setCellValue("Reusability");
+					header.createCell(31).setCellValue("Flexibility");
+					header.createCell(32).setCellValue("Understandability");
+					header.createCell(33).setCellValue("Functionality");
+					header.createCell(34).setCellValue("Extendibility");
+					header.createCell(35).setCellValue("Effectiveness");
+					header.createCell(36).setCellValue("FanIn");
+					header.createCell(37).setCellValue("AllChangedFiles");
+				}
+
+				git.checkout().setName(commitSHA.getName()).call();
+				// New code
+				RevWalk revWalk = new RevWalk(repository);
+				RevCommit currentCommit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
+
+				Analysis analysis = new Analysis(projectPath);
+				analysis.StartAnalysis();
+				ArrayList<JavaFile> javaFiles = analysis.getJavaFiles();
+				HashMap<String, JavaFile> pathToJavaFile = new HashMap<>();
+				for (JavaFile jf : javaFiles) {
+					String normPath = normalizePath(jf.getPath());
+					pathToJavaFile.put(normPath, jf);
+				}
+
+				if (previousCommit != null && previousSummaryRow != null) {
+
+					List<String> changedFiles = new ArrayList<>();
+
+					try (ObjectReader reader = repository.newObjectReader()) {
+
+						CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+						CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+
+						oldTreeIter.reset(reader, previousCommit.getTree());
+						newTreeIter.reset(reader, currentCommit.getTree());
+
+						DiffFormatter diffFormatter =
+								new DiffFormatter(DisabledOutputStream.INSTANCE);
+						diffFormatter.setRepository(repository);
+
+						List<DiffEntry> diffs =
+								diffFormatter.scan(oldTreeIter, newTreeIter);
+
+						for (DiffEntry entry : diffs) {
+							String path = entry.getNewPath();
+							if (path.endsWith(".java")) {
+								changedFiles.add(normalizePath(path));
 							}
 						}
 					}
+
+					if (!changedFiles.isEmpty()) {
+						previousSummaryRow
+								.createCell(37)
+								.setCellValue(String.join(";", changedFiles));
+					}
 				}
 
-				List<String> changedFiles = new ArrayList<>();
+				int summaryRowIndex = sheet.getLastRowNum() + 1;
+				Row summaryRow = sheet.createRow(summaryRowIndex);
 
-//				try (ObjectReader reader = repository.newObjectReader()) {
-//					CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-//					CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
-//
-//					RevCommit parent = commit.getParentCount() > 0 ? commit.getParent(0) : null;
-//					//System.out.println(commit.getParentCount());
-//					if (parent != null) {
-//						RevTree parentTree = parent.getTree();
-//						oldTreeIter.reset(reader, parentTree);
-//					}
-//					newTreeIter.reset(reader, commit.getTree());
-//
-//					DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
-//					diffFormatter.setRepository(repository);
-//
-//					List<DiffEntry> diffs = diffFormatter.scan(
-//							parent != null ? oldTreeIter : new CanonicalTreeParser(),
-//							newTreeIter
-//					);
-//
-//					for (DiffEntry entry : diffs) {
-//						String path = entry.getNewPath();
-//						if (path.endsWith(".java")) {
-//							changedFiles.add(normalizePath(path));
-//						}
-//					}
-//					StringBuilder allChanges = new StringBuilder();
-//					for(String changedFile : changedFiles){
-//						allChanges.append(changedFile).append(";");
-//					}
-//					if (allChanges.length() > 0) {
-//						Cell cell = summaryRow.getCell(37);
-//						if (cell == null) {
-//							cell = summaryRow.createCell(37);
-//						}
-//						cell.setCellValue(allChanges.toString());
-//					}
-//				}
+				summaryRow.createCell(0).setCellValue(projectName);
+				summaryRow.createCell(1).setCellValue(commitSHA.getName());
+				summaryRow.createCell(2).setCellValue(commitNumber);
+
+				fileList.clear();
+
+				sha = commitSHA.getName();
+				// Old code
+				//			Repository repository = git.getRepository();
+				//			RevWalk revWalk = new RevWalk(repository);
+				//			RevCommit commit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
+				RevTree tree = currentCommit.getTree();
+				HashMap<String, FileHandler> handlerListTest = new HashMap<>();
+
+				int lastRowNum = summaryRowIndex + 1;
+
+				try (TreeWalk treeWalk = new TreeWalk(repository)) {
+					treeWalk.addTree(tree);
+					treeWalk.setRecursive(true);
+					while (treeWalk.next()) {
+						String path = normalizePath(treeWalk.getPathString());
+						if (!path.endsWith(".java")) continue;
+						JavaFile javaFile = pathToJavaFile.get(path);
+						if (javaFile == null) {
+							System.out.println("No JavaFile found for: " + path);
+							continue;
+						}
+						Row row = sheet.createRow(lastRowNum);
+						fileList.put(path, lastRowNum);
+						row.createCell(0).setCellValue(projectName);
+						row.createCell(1).setCellValue(sha);
+						row.createCell(2).setCellValue(commitNumber);
+						row.createCell(3).setCellValue(path);
+						row.createCell(4).setCellValue(0);
+						row.createCell(7).setCellValue(javaFile.getWMC());
+						row.createCell(8).setCellValue(javaFile.getDIT());
+						row.createCell(9).setCellValue(javaFile.getNOCC());
+						row.createCell(10).setCellValue(javaFile.getCBO());
+						row.createCell(11).setCellValue(javaFile.getRFC());
+						row.createCell(12).setCellValue(javaFile.getLCOM());
+						row.createCell(13).setCellValue(javaFile.getWMCStar());
+						row.createCell(14).setCellValue(javaFile.getNOM());
+						row.createCell(15).setCellValue(javaFile.getMPC());
+						row.createCell(16).setCellValue(javaFile.getDAC());
+						row.createCell(17).setCellValue(javaFile.getSIZE1());
+						row.createCell(18).setCellValue(javaFile.getSIZE2());
+						row.createCell(19).setCellValue(javaFile.getDSC());
+						row.createCell(20).setCellValue(javaFile.getNOH());
+						row.createCell(21).setCellValue(javaFile.getANA());
+						row.createCell(22).setCellValue(javaFile.getDAM());
+						row.createCell(23).setCellValue(javaFile.getDCC());
+						row.createCell(24).setCellValue(javaFile.getCAMC());
+						row.createCell(25).setCellValue(javaFile.getMOA());
+						row.createCell(26).setCellValue(javaFile.getMFA());
+						row.createCell(27).setCellValue(javaFile.getNOP());
+						row.createCell(28).setCellValue(javaFile.getCIS());
+						row.createCell(29).setCellValue(javaFile.getNPM());
+						row.createCell(30).setCellValue(javaFile.getReusability());
+						row.createCell(31).setCellValue(javaFile.getFlexibility());
+						row.createCell(32).setCellValue(javaFile.getUnderstandability());
+						row.createCell(33).setCellValue(javaFile.getFunctionality());
+						row.createCell(34).setCellValue(javaFile.getExtendibility());
+						row.createCell(35).setCellValue(javaFile.getEffectiveness());
+						row.createCell(36).setCellValue(javaFile.getFanIn());
+
+						lastRowNum++;
+						handlerListTest.put(path, new FileHandler());
+					}
+					previousCommit = currentCommit;
+					previousSummaryRow = summaryRow;
+					commitNumber++;
+					if (!commitIter.hasNext()) {
+						break;
+					}
+					commitSHA = commitIter.next();
+
+					refHandler = detectRefs(commitSHA.getName(), repository);
+					if (refHandler != null && !refHandler.isEmpty()) {
+						for (int i = 0; i < refHandler.size(); i++) {
+							ArrayList<String> commitBeforeRef = refHandler.get(i).getFilesBeforeRef();
+							ArrayList<String> commitAfterRef = refHandler.get(i).getFilesAfterRef();
+							String refName = refHandler.get(i).getRefactoringName();
+							for (int j = 0; j < commitBeforeRef.size(); j++) {
+								String fileNameTemp = commitBeforeRef.get(j);
+								String fileName = normalizePath(fileNameTemp);
+								if (fileList.containsKey(fileName)) {
+									int rowIndex = fileList.get(fileName);
+									Row row = sheet.getRow(rowIndex);
+									row.getCell(4).setCellValue(1);
+									Cell cellRefName = row.getCell(5);
+									if (cellRefName == null) {
+										cellRefName = row.createCell(5);
+									}
+									String oldValue = cellRefName.getStringCellValue();
+									if (oldValue == null) oldValue = "";
+									cellRefName.setCellValue(refName + ";" + oldValue);
+									String allFilesInvolved = "";
+									for (String fileInvolved : commitAfterRef) {
+										allFilesInvolved += fileInvolved + ";";
+									}
+									Cell cellInvolved = row.getCell(6);
+									if (cellInvolved == null) {
+										cellInvolved = row.createCell(6);
+									}
+									String oldValue2 = cellInvolved.getStringCellValue();
+									if (oldValue2 == null) oldValue2 = "";
+									cellInvolved.setCellValue(refName + ";" + oldValue2);
+									cellInvolved.setCellValue(allFilesInvolved + " | " + cellInvolved.getStringCellValue());
+								}
+							}
+						}
+					}
+
+					List<String> changedFiles = new ArrayList<>();
+				} catch (Exception e) {
+					System.out.println("An error occurred in the while loop" + e);
+				}
 			} catch (Exception e) {
-				System.out.println("An error occurred in the while loop" + e);
+				System.err.println(
+						"Skipping commit " + commitSHA.getName() +
+								" due to error: " + e.getMessage()
+				);
+				e.printStackTrace();
+				commitNumber++;
 			}
-		}
 
+		}
 		if (workbook != null) {
 			try (FileOutputStream fos = new FileOutputStream(filePath)) {
 				workbook.write(fos);
@@ -690,26 +682,22 @@ public class Main {
 		}
 
 		git.checkout().setName(branchName).call();
-
 	}
 
 
-
-
-
-
-	private static void csvWritingTest(String projectName, int step, String gitURL, String projectPath) throws GitAPIException, IOException {
+	private static void csvWritingTest(String projectName, int step, String gitURL, String projectPath) throws
+			GitAPIException, IOException {
 		int commitNumber = 0;
 		int refNumber = 0;
 		GitService gitService = new GitServiceImpl();
 
-        try {
-            Repository repo = gitService.cloneIfNotExists(projectName, gitURL);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+		try {
+			Repository repo = gitService.cloneIfNotExists(projectName, gitURL);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
-        Git git = Git.open(new File(projectPath));
+		Git git = Git.open(new File(projectPath));
 		System.out.println("afterGit.open()");
 
 		Iterable<RevCommit> commits = git.log().call();
@@ -751,7 +739,7 @@ public class Main {
 
 			System.out.println("Outside if filepath: " + filePath);
 
-			if(writer == null) {
+			if (writer == null) {
 				System.out.println("Inside filepath if: " + filePath);
 				writer = new FileWriter(filePath);
 				writer.write("projectName,SHA,CommitNumber,Files,Refactored,RefactoringType,Affected Files\n");
@@ -760,7 +748,7 @@ public class Main {
 			refHandler = detectRefs(commitSHA.getName(), repository);
 			System.out.println(refHandler);
 
-			for(int i = 0; i < refHandler.size(); i++) {
+			for (int i = 0; i < refHandler.size(); i++) {
 				ArrayList<String> commitBeforeRef = refHandler.get(i).getFilesBeforeRef();
 				String refName = refHandler.get(i).getRefactoringName();
 				System.out.println("This is the ref: " + refName);
@@ -770,7 +758,7 @@ public class Main {
 //					System.out.println("Is " + commitBeforeRef.get(j) + " in fileList: " + fileList.containsKey(commitBeforeRef.get(j)) +
 //							" Keys: " + fileList.get(commitBeforeRef.get(j)));
 					String fileName = commitBeforeRef.get(j);
-					if(fileList.containsKey(fileName)) {
+					if (fileList.containsKey(fileName)) {
 						ArrayList<Ref> tempRefs = fileList.get(fileName);
 						tempRefs.add(refHandler.get(i));
 						fileList.put(fileName, tempRefs);
@@ -789,10 +777,10 @@ public class Main {
 					}
 					System.out.println("Refactorings to be written: " + refactorings + " for the file: " + node.getKey());
 					System.out.println(handlerListTest.get(node.getKey()));
-					if(handlerListTest.get(node.getKey()).getFilaPath().equals("")) {
+					if (handlerListTest.get(node.getKey()).getFilaPath().equals("")) {
 						FileHandler aHandler = new FileHandler(refactorings, filesInvolved, commitSHA.getName(), node.getKey(), String.valueOf(commitNumber));
 						handlerListTest.put(node.getKey(), aHandler);
-					}else{
+					} else {
 						FileHandler handle = handlerListTest.get(node.getKey());
 						handle.setAll(filesInvolved, refactorings);
 						handlerListTest.put(node.getKey(), handle);
@@ -803,20 +791,20 @@ public class Main {
 
 			}
 //			System.out.println("handlerList size: " + handlerList.size());
-		for (Map.Entry<String, FileHandler> node : handlerListTest.entrySet()) {
+			for (Map.Entry<String, FileHandler> node : handlerListTest.entrySet()) {
 //				System.out.println(handlerList.get(i).getRefactorings() + " Inside writing to excel: " + String.format("%s,%s,%s,%s,%s,%s,%n",
 //						projectName.replace("Allprojects" + File.separator, ""),
 //						sha, commitNumber, handlerList.get(i).getFilaPath(), handlerList.get(i).getRefactorings(),
 //						handlerList.get(i).getFilesAfterRefs()));
 
-			writer.write(String.format("%s,%s,%s,%s,%s,%s,%n", projectName.replace("Allprojects" +
-					File.separator, ""), sha, commitNumber, node.getValue().getFilaPath(),
-					node.getValue().getRefactorings(), node.getValue().getFilesAfterRefs()));
-		}
+				writer.write(String.format("%s,%s,%s,%s,%s,%s,%n", projectName.replace("Allprojects" +
+								File.separator, ""), sha, commitNumber, node.getValue().getFilaPath(),
+						node.getValue().getRefactorings(), node.getValue().getFilesAfterRefs()));
+			}
 
-		if(commitNumber % 5 == 0){
-			writer = null;
-		}
+			if (commitNumber % 5 == 0) {
+				writer = null;
+			}
 
 //			try (TreeWalk treeWalk = new TreeWalk(repository)) {
 //				treeWalk.addTree(tree);
