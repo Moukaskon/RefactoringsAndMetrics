@@ -538,9 +538,13 @@ public class Main {
 					}
 
 					if (!changedFiles.isEmpty()) {
+						String str = String.join(";", changedFiles);
+						if(str.length() > 30000){
+							str = str.substring(0, 30000);
+						}
 						previousSummaryRow
 								.createCell(37)
-								.setCellValue(String.join(";", changedFiles));
+								.setCellValue(str);
 					}
 				}
 
