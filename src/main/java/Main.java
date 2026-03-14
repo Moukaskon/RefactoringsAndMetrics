@@ -494,10 +494,23 @@ public class Main {
 					header.createCell(35).setCellValue("Effectiveness");
 					header.createCell(36).setCellValue("FanIn");
 					header.createCell(37).setCellValue("AllChangedFiles");
+					header.createCell(38).setCellValue("Balance");
+					header.createCell(39).setCellValue("Equilibrium");
+					header.createCell(40).setCellValue("Density");
+					header.createCell(41).setCellValue("Regularity");
+					header.createCell(42).setCellValue("Rhythm");
+					header.createCell(43).setCellValue("Sequence");
+					header.createCell(44).setCellValue("Simplicity");
+					header.createCell(45).setCellValue("Symmetry");
 				}
 
 				git.checkout().setName(commitSHA.getName()).call();
-				// New code
+				runPythonMetrics(projectPath);
+				String projectFolder = new File(projectPath).getName();
+				String csvName = projectPath + File.separator + projectFolder + "_beauty.csv";
+
+				Map<String, BeautyMetrics> beautyMap = loadBeautyCSV(csvName);
+
 				RevWalk revWalk = new RevWalk(repository);
 				RevCommit currentCommit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
 
@@ -615,6 +628,19 @@ public class Main {
 						row.createCell(34).setCellValue(javaFile.getExtendibility());
 						row.createCell(35).setCellValue(javaFile.getEffectiveness());
 						row.createCell(36).setCellValue(javaFile.getFanIn());
+						BeautyMetrics bm = beautyMap.get(path);
+
+						if(bm != null){
+							row.createCell(38).setCellValue(bm.getBalance());
+							row.createCell(39).setCellValue(bm.getEquilibrium());
+							row.createCell(40).setCellValue(bm.getDensity());
+							row.createCell(41).setCellValue(bm.getRegularity());
+							row.createCell(42).setCellValue(bm.getRhythm());
+							row.createCell(43).setCellValue(bm.getSequence());
+							row.createCell(44).setCellValue(bm.getSimplicity());
+							row.createCell(45).setCellValue(bm.getSymmetry());
+						}
+
 
 						lastRowNum++;
 						handlerListTest.put(path, new FileHandler());
@@ -688,170 +714,64 @@ public class Main {
 		git.checkout().setName(branchName).call();
 	}
 
-
-	private static void csvWritingTest(String projectName, int step, String gitURL, String projectPath) throws
-			GitAPIException, IOException {
-		int commitNumber = 0;
-		int refNumber = 0;
-		GitService gitService = new GitServiceImpl();
-
+	public static void runPythonMetrics(String projectPath) {
 		try {
-			Repository repo = gitService.cloneIfNotExists(projectName, gitURL);
+
+			ProcessBuilder pb = new ProcessBuilder(
+					"python",
+					"C:\\Users\\kmoukas\\Downloads\\SomethingUnimportant\\Code_Beauty_Calculator\\code aesthetics\\aesthetics_main.py",
+					projectPath
+			);
+
+			pb.redirectErrorStream(true);
+
+			Process process = pb.start();
+
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(process.getInputStream())
+			);
+
+			String line;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+
+			int exitCode = process.waitFor();
+			System.out.println("Python script finished with code " + exitCode);
+
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+		}
+	}
+
+	public static Map<String, BeautyMetrics> loadBeautyCSV(String path) throws IOException {
+
+		Map<String, BeautyMetrics> map = new HashMap<>();
+
+		BufferedReader br = new BufferedReader(new FileReader(path));
+		String line = br.readLine(); // skip header
+
+		while((line = br.readLine()) != null){
+
+			String[] parts = line.split(",");
+
+			BeautyMetrics m = new BeautyMetrics(
+					Double.parseDouble(parts[1]),
+					Double.parseDouble(parts[2]),
+					Double.parseDouble(parts[3]),
+					Double.parseDouble(parts[4]),
+					Double.parseDouble(parts[5]),
+					Double.parseDouble(parts[6]),
+					Double.parseDouble(parts[7]),
+					Double.parseDouble(parts[8])
+			);
+
+			map.put(parts[0].toLowerCase(), m);
 		}
 
-		Git git = Git.open(new File(projectPath));
-		System.out.println("afterGit.open()");
+		br.close();
 
-		Iterable<RevCommit> commits = git.log().call();
-		String sha;
-		HashMap<String, ArrayList<Ref>> fileList = new HashMap<>();
-		FileWriter writer = null;
-		ArrayList<Ref> refHandler;
-		ArrayList<CommitBeforeRef> commitBeforeRefs;
-		ArrayList<CommitAfterRef> commitAfterRefs;
-
-
-		for (RevCommit commitSHA : commits) {
-			commitNumber++;
-			ArrayList<FileHandler> handlerList = new ArrayList<>();
-			sha = commitSHA.getName();
-			Repository repository = git.getRepository();
-			RevWalk revWalk = new RevWalk(repository);
-			RevCommit commit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
-			RevTree tree = commit.getTree();
-			HashMap<String, FileHandler> handlerListTest = new HashMap<>();
-
-			try (TreeWalk treeWalk = new TreeWalk(repository)) {
-				treeWalk.addTree(tree);
-				treeWalk.setRecursive(true);
-
-				while (treeWalk.next()) {
-					String path = treeWalk.getPathString();
-					if (path.endsWith(".java")) {
-						fileList.put(path, new ArrayList<>());
-						handlerListTest.put(path, new FileHandler());
-					}
-				}
-			} catch (Exception e) {
-				//To do
-			}
-			int x = commitNumber + step - 1;
-			String filePath = "CSVs" + File.separator + projectName.replace("Allprojects"
-					+ File.separator, "") + commitNumber + " - " + x + "_refactoring_data.csv";
-
-			System.out.println("Outside if filepath: " + filePath);
-
-			if (writer == null) {
-				System.out.println("Inside filepath if: " + filePath);
-				writer = new FileWriter(filePath);
-				writer.write("projectName,SHA,CommitNumber,Files,Refactored,RefactoringType,Affected Files\n");
-			}
-
-			refHandler = detectRefs(commitSHA.getName(), repository);
-			System.out.println(refHandler);
-
-			for (int i = 0; i < refHandler.size(); i++) {
-				ArrayList<String> commitBeforeRef = refHandler.get(i).getFilesBeforeRef();
-				String refName = refHandler.get(i).getRefactoringName();
-				System.out.println("This is the ref: " + refName);
-				String refactorings = "";
-				String filesInvolved = "";
-				for (int j = 0; j < commitBeforeRef.size(); j++) {
-//					System.out.println("Is " + commitBeforeRef.get(j) + " in fileList: " + fileList.containsKey(commitBeforeRef.get(j)) +
-//							" Keys: " + fileList.get(commitBeforeRef.get(j)));
-					String fileName = commitBeforeRef.get(j);
-					if (fileList.containsKey(fileName)) {
-						ArrayList<Ref> tempRefs = fileList.get(fileName);
-						tempRefs.add(refHandler.get(i));
-						fileList.put(fileName, tempRefs);
-					}
-
-					//writer.write(String.format("%s,%s,\"%s\",%s,\"%s\"%n", projectName.replace("Allprojects" + File.separator, ""), sha, beforeJoined, ref, afterJoined));
-				}
-				System.out.println("fileList size: " + fileList.size());
-				for (Map.Entry<String, ArrayList<Ref>> node : fileList.entrySet()) {
-					ArrayList<Ref> refs = node.getValue();
-					System.out.println("In the begining: " + node.getValue());
-					for (Ref ref : refs) {
-						refactorings += ref.getRefactoringName() + " ";
-						filesInvolved = String.join(" ", ref.getFilesAfterRef());
-						filesInvolved = filesInvolved + "\" ";
-					}
-					System.out.println("Refactorings to be written: " + refactorings + " for the file: " + node.getKey());
-					System.out.println(handlerListTest.get(node.getKey()));
-					if (handlerListTest.get(node.getKey()).getFilaPath().equals("")) {
-						FileHandler aHandler = new FileHandler(refactorings, filesInvolved, commitSHA.getName(), node.getKey(), String.valueOf(commitNumber));
-						handlerListTest.put(node.getKey(), aHandler);
-					} else {
-						FileHandler handle = handlerListTest.get(node.getKey());
-						handle.setAll(filesInvolved, refactorings);
-						handlerListTest.put(node.getKey(), handle);
-					}
-					System.out.println("At the end: " + node.getKey());
-					fileList.put(node.getKey(), new ArrayList<>());
-				}
-
-			}
-//			System.out.println("handlerList size: " + handlerList.size());
-			for (Map.Entry<String, FileHandler> node : handlerListTest.entrySet()) {
-//				System.out.println(handlerList.get(i).getRefactorings() + " Inside writing to excel: " + String.format("%s,%s,%s,%s,%s,%s,%n",
-//						projectName.replace("Allprojects" + File.separator, ""),
-//						sha, commitNumber, handlerList.get(i).getFilaPath(), handlerList.get(i).getRefactorings(),
-//						handlerList.get(i).getFilesAfterRefs()));
-
-				writer.write(String.format("%s,%s,%s,%s,%s,%s,%n", projectName.replace("Allprojects" +
-								File.separator, ""), sha, commitNumber, node.getValue().getFilaPath(),
-						node.getValue().getRefactorings(), node.getValue().getFilesAfterRefs()));
-			}
-
-			if (commitNumber % 5 == 0) {
-				writer = null;
-			}
-
-//			try (TreeWalk treeWalk = new TreeWalk(repository)) {
-//				treeWalk.addTree(tree);
-//				treeWalk.setRecursive(true);
-//
-//				while (treeWalk.next()) {
-//					String path = treeWalk.getPathString();
-//					if (path.endsWith(".java")) {
-//						fileList.add(path);
-//					}
-//				}
-//			} catch (Exception e) {
-//				//To do
-//			}
-//			int x = commitNumber + step - 1;
-//			String filePath = "CSVs" + File.separator + projectName.replace("Allprojects"
-//					+ File.separator, "") + commitNumber + " - " + x + "_refactoring_data.csv";
-//			if(writer == null) {
-//				writer = new FileWriter(filePath, true);
-//				writer.write("projectName,SHA,CommitNumber,Files,Refactored,RefactoringType,Affected Files\n");
-//			}
-//			try {
-//
-//				for (String file : fileList) {
-//					writer.write(String.format("%s,%s,%s,%s,%n", projectName.replace("Allprojects" +
-//							File.separator, ""), sha, commitNumber, file));
-//				}
-//
-//				fileList.clear();
-//			} catch (IOException e) {
-//				throw new RuntimeException(e);
-//			}
-//			if (commitNumber % step == 0 && writer != null) {
-//				try {
-//					writer.close();
-//				} catch (IOException e) {
-//					throw new RuntimeException(e);
-//				}
-//				writer = null;
-//			}
-
-		}
-
+		return map;
 	}
 
 	public static ArrayList<Ref> detectRefs(String commitSHA, Repository repo) throws GitAPIException, IOException {
