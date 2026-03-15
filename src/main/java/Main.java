@@ -22,6 +22,8 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.GitService;
 import org.refactoringminer.api.Refactoring;
@@ -505,11 +507,6 @@ public class Main {
 				}
 
 				git.checkout().setName(commitSHA.getName()).call();
-				runPythonMetrics(projectPath);
-				String projectFolder = new File(projectPath).getName();
-				String csvName = projectPath + File.separator + projectFolder + "_beauty.csv";
-
-				Map<String, BeautyMetrics> beautyMap = loadBeautyCSV(csvName);
 
 				RevWalk revWalk = new RevWalk(repository);
 				RevCommit currentCommit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
@@ -628,7 +625,8 @@ public class Main {
 						row.createCell(34).setCellValue(javaFile.getExtendibility());
 						row.createCell(35).setCellValue(javaFile.getEffectiveness());
 						row.createCell(36).setCellValue(javaFile.getFanIn());
-						BeautyMetrics bm = beautyMap.get(path);
+						String fullPath = new File(projectPath, path).getAbsolutePath();
+						BeautyMetrics bm = runPythonForFile(fullPath);
 
 						if(bm != null){
 							row.createCell(38).setCellValue(bm.getBalance());
@@ -714,13 +712,14 @@ public class Main {
 		git.checkout().setName(branchName).call();
 	}
 
-	public static void runPythonMetrics(String projectPath) {
+	public static BeautyMetrics runPythonForFile(String filePath) {
+
 		try {
 
 			ProcessBuilder pb = new ProcessBuilder(
 					"python",
 					"C:\\Users\\kmoukas\\Downloads\\SomethingUnimportant\\Code_Beauty_Calculator\\code aesthetics\\aesthetics_main.py",
-					projectPath
+					filePath
 			);
 
 			pb.redirectErrorStream(true);
@@ -731,47 +730,41 @@ public class Main {
 					new InputStreamReader(process.getInputStream())
 			);
 
+			StringBuilder output = new StringBuilder();
 			String line;
+
 			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
+				output.append(line);
 			}
 
-			int exitCode = process.waitFor();
-			System.out.println("Python script finished with code " + exitCode);
+			String json = output.toString();
+
+			if (json == null || json.isEmpty()) {
+				System.out.println("Python returned no output for: " + filePath);
+				return null;
+			}
+
+			process.waitFor();
+
+			JSONParser parser = new JSONParser();
+			JSONObject obj = (JSONObject) parser.parse(json);
+
+			return new BeautyMetrics(
+					(Double) obj.get("balance"),
+					(Double) obj.get("equilibrium"),
+					(Double) obj.get("density"),
+					(Double) obj.get("regularity"),
+					(Double) obj.get("rhythm"),
+					(Double) obj.get("sequence"),
+					(Double) obj.get("simplicity"),
+					(Double) obj.get("symmetry")
+			);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
 
-	public static Map<String, BeautyMetrics> loadBeautyCSV(String path) throws IOException {
-
-		Map<String, BeautyMetrics> map = new HashMap<>();
-
-		BufferedReader br = new BufferedReader(new FileReader(path));
-		String line = br.readLine(); // skip header
-
-		while((line = br.readLine()) != null){
-
-			String[] parts = line.split(",");
-
-			BeautyMetrics m = new BeautyMetrics(
-					Double.parseDouble(parts[1]),
-					Double.parseDouble(parts[2]),
-					Double.parseDouble(parts[3]),
-					Double.parseDouble(parts[4]),
-					Double.parseDouble(parts[5]),
-					Double.parseDouble(parts[6]),
-					Double.parseDouble(parts[7]),
-					Double.parseDouble(parts[8])
-			);
-
-			map.put(parts[0].toLowerCase(), m);
-		}
-
-		br.close();
-
-		return map;
+		return null;
 	}
 
 	public static ArrayList<Ref> detectRefs(String commitSHA, Repository repo) throws GitAPIException, IOException {
