@@ -33,8 +33,7 @@ public class Analysis {
 
         //For Linux
         try {
-            String home = System.getProperty("user.dir");
-            home += "\\src\\main\\java";
+            String home = System.getProperty("user.dir") + "/src/main/java";
             if(!System.getProperty("os.name").toLowerCase().contains("win")) {
                 ProcessBuilder pbuilder2 = new ProcessBuilder("bash", "-c", "cd " + home +
                         "; java -jar -Xmx32g MetricsCalculatorSnap.jar "+ projectPath + " "+thread);
@@ -95,8 +94,7 @@ public class Analysis {
         }
 
         try {
-            String home = System.getProperty("user.dir");
-            home += "\\src\\main\\java\\";
+            String home = System.getProperty("user.dir") + "/src/main/java/";
             File myObj = new File(home + thread);
 //            System.out.println("Looking for file: " + myObj.getAbsolutePath());
 //            System.out.println(myObj.exists() + " " + myObj.getName());

@@ -1,0 +1,12 @@
+services:
+  refactoring-analyzer:
+    build: .
+    volumes:
+      - ./Allprojects:/app/Allprojects   # git clones persist here
+      - ./XLSXs:/app/XLSXs               # output persists here
+      - ./CSVs:/app/CSVs
+    environment:
+      - BEAUTY_SCRIPT_PATH=/app/aesthetics/aesthetics_main.py
+    command: ["https://github.com/some/repo.git"]
+    # For the 3-arg form:
+    # command: ["https://github.com/some/repo.git", "abc123sha"]
