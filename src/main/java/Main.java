@@ -67,13 +67,21 @@ public class Main {
 		System.out.println("Number of Command Line Argument = " + args.length);
 		int numOfCommits = 0;
 
+		// Usage: <gitURL> [startCommitSHA] [startCommitNumber]
+		//   args[0] - required: Git repository URL
+		//   args[1] - optional: SHA of the commit to start FROM (exclusive lower bound)
+		//             Pass "null" or omit to start from the very beginning.
+		//   args[2] - optional: the commit counter offset to use for args[1].
+		//             Needed so XLSX batch files keep correct numbering when resuming.
+		//             Defaults to 0 if omitted.
 		System.out.println("Command Line Argument length: " + args.length);
 		projects.add(args[0]);
 		String startingCommit = null;
 		int startingCommitNumber = 0;
-		if (args.length == 2) {
+		if (args.length >= 2 && !args[1].equalsIgnoreCase("null")) {
 			startingCommit = args[1];
-		} else if (args.length == 3) {
+		}
+		if (args.length >= 3) {
 			startingCommitNumber = Integer.parseInt(args[2]);
 		}
 

@@ -7,6 +7,6 @@ services:
       - ./CSVs:/app/CSVs
     environment:
       - BEAUTY_SCRIPT_PATH=/app/aesthetics/aesthetics_main.py
-    command: ["https://github.com/some/repo.git"]
+    command: ["https://github.com/teomaik/DeRec-GEA.git"]
     # For the 3-arg form:
     # command: ["https://github.com/some/repo.git", "abc123sha"]
