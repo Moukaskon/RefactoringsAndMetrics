@@ -12,8 +12,10 @@ FROM eclipse-temurin:21-jdk
 
 RUN apt-get update && apt-get install -y \
     python3 \
+    python3-pip \
     git \
     && ln -s /usr/bin/python3 /usr/bin/python \
+    && pip3 install --no-cache-dir --break-system-packages openpyxl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -22,12 +24,10 @@ COPY src/main/java/MetricsCalculatorSnap.jar /app/src/main/java/
 
 COPY --from=builder /build/target/*-jar-with-dependencies.jar app.jar
 
-# Copy all beauty metric modules together — they must share a directory
-# since aesthetics_main.py imports them as siblings
+# Copy all beauty metric modules (beauty_worker.py + siblings)
 COPY aesthetics/ ./aesthetics/
 
 RUN mkdir -p /app/Allprojects /app/XLSXs /app/CSVs
 
-ENV BEAUTY_SCRIPT_PATH=/app/aesthetics/aesthetics_main.py
-
+# Java miner entry point — beauty worker is launched as a separate container
 ENTRYPOINT ["java", "-Xmx4g", "-jar", "app.jar"]

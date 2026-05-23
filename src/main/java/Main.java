@@ -2,6 +2,8 @@ package main.java;
 
 import java.io.*;
 import java.util.*;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.poi.ss.usermodel.Cell;
@@ -386,10 +388,109 @@ public class Main {
 		return norm;
 	}
 
+	// -----------------------------------------------------------------------
+	// Persistent Python server – started once per analysis, kept alive
+	// -----------------------------------------------------------------------
+
+	private static Process pythonServerProcess = null;
+	private static BufferedWriter pythonServerIn = null;
+	private static BufferedReader pythonServerOut = null;
+
+	private static void startPythonServer() throws IOException {
+		if (pythonServerProcess != null && pythonServerProcess.isAlive()) {
+			return; // already running
+		}
+
+		String scriptPath = System.getenv().getOrDefault(
+				"BEAUTY_SCRIPT_PATH",
+				"/app/aesthetics/aesthetics_server.py"
+		);
+
+		ProcessBuilder pb = new ProcessBuilder("python3", scriptPath);
+		pb.redirectErrorStream(false);
+		pythonServerProcess = pb.start();
+
+		// Drain stderr in a background thread so it never blocks
+		final InputStream errStream = pythonServerProcess.getErrorStream();
+		new Thread(() -> {
+			try (BufferedReader err = new BufferedReader(new InputStreamReader(errStream))) {
+				String line;
+				while ((line = err.readLine()) != null) {
+					System.err.println("[python] " + line);
+				}
+			} catch (IOException ignored) {}
+		}, "python-stderr-drain").start();
+
+		pythonServerIn  = new BufferedWriter(new OutputStreamWriter(pythonServerProcess.getOutputStream()));
+		pythonServerOut = new BufferedReader(new InputStreamReader(pythonServerProcess.getInputStream()));
+
+		System.out.println("[Main] Python beauty-metrics server started (PID=" + pythonServerProcess.pid() + ")");
+	}
+
+	private static void stopPythonServer() {
+		try {
+			if (pythonServerIn != null) pythonServerIn.close();
+		} catch (IOException ignored) {}
+		if (pythonServerProcess != null) pythonServerProcess.destroyForcibly();
+		pythonServerProcess = null;
+		System.out.println("[Main] Python beauty-metrics server stopped.");
+	}
+
+	/**
+	 * Sends a request to the persistent Python server and returns the
+	 * beauty-metrics map for all .java files in projectPath.
+	 *
+	 * JSON request:  {"projectPath": "..."}
+	 * JSON response: {"status": "ok", "metrics": {"rel/file.java": [b,e,d,r,rh,sq,si,sy]}}
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map<String, BeautyMetrics> runPythonMetricsServer(String projectPath) throws IOException {
+		if (pythonServerProcess == null || !pythonServerProcess.isAlive()) {
+			System.err.println("[Main] Python server not running – restarting.");
+			startPythonServer();
+		}
+
+		// Build and send request
+		String request = "{\"projectPath\": \"" + projectPath.replace("\\", "/") + "\"}";
+		pythonServerIn.write(request + "\n");
+		pythonServerIn.flush();
+
+		// Read exactly one response line
+		String responseLine = pythonServerOut.readLine();
+		if (responseLine == null) {
+			throw new IOException("Python server closed stdout unexpectedly.");
+		}
+
+		// Parse JSON using Gson
+		Gson gson = new Gson();
+		java.lang.reflect.Type mapType = new TypeToken<Map<String, Object>>(){}.getType();
+		Map<String, Object> response = gson.fromJson(responseLine, mapType);
+
+		if (!"ok".equals(response.get("status"))) {
+			throw new IOException("Python server error: " + response.get("message"));
+		}
+
+		Map<String, Object> rawMetrics = (Map<String, Object>) response.get("metrics");
+		Map<String, BeautyMetrics> result = new HashMap<>();
+		for (Map.Entry<String, Object> entry : rawMetrics.entrySet()) {
+			List<Double> vals = (List<Double>) entry.getValue();
+			result.put(entry.getKey(), new BeautyMetrics(
+					vals.get(0), vals.get(1), vals.get(2), vals.get(3),
+					vals.get(4), vals.get(5), vals.get(6), vals.get(7)
+			));
+		}
+		return result;
+	}
+
+	// -----------------------------------------------------------------------
+
 	public static void writeXlsxText(String projectName, int step, String gitURL, String projectPath,
 			String startCommitSHA, int commitNumberArg) throws IOException, GitAPIException {
 
 		int commitNumber = commitNumberArg;
+
+		// NOTE: beauty metrics are now computed by the external beauty_worker.py
+		// process running against Clone B.  Do NOT start the Python server here.
 
 		GitService gitService = new GitServiceImpl();
 
@@ -456,6 +557,8 @@ public class Main {
 							workbook.write(fos);
 						}
 						workbook.close();
+						// Signal the Python beauty_worker that this batch is ready
+						writeReadySignal(filePath);
 					}
 
 					batchStart = commitNumber;
@@ -524,11 +627,8 @@ public class Main {
 				}
 
 				git.checkout().setName(commitSHA.getName()).call();
-				runPythonMetrics(projectPath);
-				String projectFolder = new File(projectPath).getName();
-				String csvName = projectPath + File.separator + projectFolder + "_beauty.csv";
-
-				Map<String, BeautyMetrics> beautyMap = loadBeautyCSV(csvName);
+				// Beauty metrics are now filled by the external beauty_worker.py (Clone B).
+				// We leave columns 38-45 blank; the worker patches the xlsx after we signal it.
 
 				RevWalk revWalk = new RevWalk(repository);
 				RevCommit currentCommit = revWalk.parseCommit(repository.resolve(commitSHA.getName()));
@@ -647,18 +747,8 @@ public class Main {
 						row.createCell(34).setCellValue(javaFile.getExtendibility());
 						row.createCell(35).setCellValue(javaFile.getEffectiveness());
 						row.createCell(36).setCellValue(javaFile.getFanIn());
-						BeautyMetrics bm = beautyMap.get(path);
-
-						if (bm != null) {
-							row.createCell(38).setCellValue(bm.getBalance());
-							row.createCell(39).setCellValue(bm.getEquilibrium());
-							row.createCell(40).setCellValue(bm.getDensity());
-							row.createCell(41).setCellValue(bm.getRegularity());
-							row.createCell(42).setCellValue(bm.getRhythm());
-							row.createCell(43).setCellValue(bm.getSequence());
-							row.createCell(44).setCellValue(bm.getSimplicity());
-							row.createCell(45).setCellValue(bm.getSymmetry());
-						}
+						// Columns 38-45 (beauty metrics) intentionally left empty.
+						// beauty_worker.py will fill them after reading the .ready signal.
 
 						lastRowNum++;
 						handlerListTest.put(path, new FileHandler());
@@ -729,72 +819,54 @@ public class Main {
 				workbook.write(fos);
 			}
 			workbook.close();
+			// Signal the Python beauty_worker for the final batch
+			writeReadySignal(filePath);
 		}
 
 		git.checkout().setName(branchName).call();
+
+		// Write the global ALL_DONE sentinel so beauty_worker.py knows to exit
+		// after processing the last batch.
+		String cleanName = projectName.replace("Allprojects" + File.separator, "");
+		File sentinelFile = new File("XLSXs" + File.separator + cleanName
+				+ File.separator + "ALL_DONE.sentinel");
+		try (FileWriter sw = new FileWriter(sentinelFile)) {
+			sw.write("done\n");
+		}
+		System.out.println("[Main] ALL_DONE sentinel written: " + sentinelFile.getAbsolutePath());
 	}
 
+	/**
+	 * Writes a &lt;batchXlsxPath&gt;.ready signal file alongside the xlsx so that
+	 * the external beauty_worker.py process knows this batch is ready to process.
+	 */
+	private static void writeReadySignal(String xlsxPath) {
+		String signalPath = xlsxPath.replaceAll("\\.xlsx$", ".ready");
+		try (FileWriter fw = new FileWriter(signalPath)) {
+			fw.write(xlsxPath + "\n");
+			System.out.println("[Main] Ready signal written: " + signalPath);
+		} catch (IOException e) {
+			System.err.println("[Main] WARNING: could not write ready signal: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * @deprecated Superseded by the two-clone pipeline (beauty_worker.py).
+	 * Kept only so existing callers outside this class (if any) still compile.
+	 */
+	@Deprecated
 	public static void runPythonMetrics(String projectPath) {
-		try {
-
-			String scriptPath = System.getenv().getOrDefault(
-					"BEAUTY_SCRIPT_PATH",
-					"/app/aesthetics/aesthetics_main.py"
-			);
-
-			ProcessBuilder pb = new ProcessBuilder(
-					"python3",
-					scriptPath,
-					projectPath
-			);
-
-			pb.redirectErrorStream(true);
-
-			Process process = pb.start();
-
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(process.getInputStream()));
-
-			String line;
-			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
-			}
-
-			int exitCode = process.waitFor();
-			System.out.println("Python script finished with code " + exitCode);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		throw new UnsupportedOperationException(
+				"runPythonMetrics is removed. Use beauty_worker.py instead.");
 	}
 
+	/**
+	 * @deprecated Superseded by the two-clone pipeline (beauty_worker.py).
+	 */
+	@Deprecated
 	public static Map<String, BeautyMetrics> loadBeautyCSV(String path) throws IOException {
-
-		Map<String, BeautyMetrics> map = new HashMap<>();
-
-		BufferedReader br = new BufferedReader(new FileReader(path));
-		String line = br.readLine(); // skip header
-
-		while ((line = br.readLine()) != null) {
-
-			String[] parts = line.split(",");
-
-			BeautyMetrics m = new BeautyMetrics(
-					Double.parseDouble(parts[1]),
-					Double.parseDouble(parts[2]),
-					Double.parseDouble(parts[3]),
-					Double.parseDouble(parts[4]),
-					Double.parseDouble(parts[5]),
-					Double.parseDouble(parts[6]),
-					Double.parseDouble(parts[7]),
-					Double.parseDouble(parts[8]));
-
-			map.put(parts[0].toLowerCase(), m);
-		}
-
-		br.close();
-
-		return map;
+		throw new UnsupportedOperationException(
+				"loadBeautyCSV is removed. Use beauty_worker.py instead.");
 	}
 
 	public static ArrayList<Ref> detectRefs(String commitSHA, Repository repo) throws GitAPIException, IOException {

@@ -1,12 +1,34 @@
 services:
+
+  # ── Clone A: Java miner ──────────────────────────────────────────────────────
   refactoring-analyzer:
     build: .
     volumes:
-      - ./Allprojects:/app/Allprojects   # git clones persist here
-      - ./XLSXs:/app/XLSXs               # output persists here
+      - ./Allprojects:/app/Allprojects         # Clone A lives here
+      - ./XLSXs:/app/XLSXs                     # xlsx batches + .ready signals
       - ./CSVs:/app/CSVs
-    environment:
-      - BEAUTY_SCRIPT_PATH=/app/aesthetics/aesthetics_main.py
-    command: ["https://github.com/teomaik/DeRec-GEA.git"]
-    # For the 3-arg form:
-    # command: ["https://github.com/some/repo.git", "abc123sha"]
+    # Full run (fresh start):
+#    command: ["https://github.com/apache/commons-lang"]
+    # Resume from a specific commit (SHA + commit-number offset):
+    command: ["https://github.com/apache/commons-lang",
+               "33067a68ba98f69e5dc978a7fb263d0b3c6754f2",
+               "1024"]
+
+  # ── Clone B: Python beauty worker ────────────────────────────────────────────
+  beauty-worker:
+    build: .
+    volumes:
+      - ./Allprojects-beauty:/app/Allprojects-beauty  # Clone B (separate checkout dir)
+      - ./XLSXs:/app/XLSXs                            # shared: watches for .ready signals
+    # Override the Java entrypoint — run beauty_worker.py directly
+    entrypoint: ["python3", "/app/aesthetics/beauty_worker.py"]
+    command:
+      - "--watch-dir=/app/XLSXs/commons-lang"
+      - "--clone-b=/app/Allprojects-beauty/commons-lang"
+      - "--git-url=https://github.com/apache/commons-lang"
+      - "--workers=8"
+      - "--poll=2"
+      # Resume: skip batches already processed (match Java's startingCommitNumber):
+      - "--start-from-commit=1024"
+    depends_on:
+      - refactoring-analyzer
