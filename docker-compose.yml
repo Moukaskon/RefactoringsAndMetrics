@@ -11,8 +11,8 @@ services:
 #    command: ["https://github.com/apache/commons-lang"]
     # Resume from a specific commit (SHA + commit-number offset):
     command: ["https://github.com/apache/commons-lang",
-               "33067a68ba98f69e5dc978a7fb263d0b3c6754f2",
-               "1024"]
+               "184c9e83211a0552698a934d45d3ebca2c789881",
+               "1123"]
 
   # ── Clone B: Python beauty worker ────────────────────────────────────────────
   beauty-worker:
@@ -29,6 +29,6 @@ services:
       - "--workers=8"
       - "--poll=2"
       # Resume: skip batches already processed (match Java's startingCommitNumber):
-      - "--start-from-commit=1024"
+      - "--start-from-commit=1123"
     depends_on:
       - refactoring-analyzer
