@@ -1,6 +1,7 @@
 package main.java;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -181,6 +182,60 @@ public class Utils {
         return System.getProperty("os.name").toLowerCase().contains("win");
     }
 
+    /**
+     * Returns true if the string is a positive integer (used for CLI resume parsing).
+     */
+    public static boolean isPositiveInteger(String value) {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            if (!Character.isDigit(value.charAt(i))) {
+                return false;
+            }
+        }
+        return Integer.parseInt(value) > 0;
+    }
+
+    /**
+     * Builds the same oldest→newest commit order used by {@link Main#writeXlsxText}
+     * on a fresh run ({@code git log} then reverse).
+     */
+    public static List<String> getChronologicalCommitShas(Git git) throws GitAPIException {
+        List<String> newestFirst = new ArrayList<>();
+        for (RevCommit commit : git.log().call()) {
+            newestFirst.add(commit.getName());
+        }
+        Collections.reverse(newestFirst);
+        return newestFirst;
+    }
+
+    /**
+     * SHA of the last commit already processed before {@code startCommitNumber}.
+     * That commit is the exclusive lower bound for {@code git log A..HEAD}.
+     *
+     * @param startCommitNumber 1-based index of the first commit to analyze on resume
+     * @return full SHA, or {@code null} when {@code startCommitNumber <= 1}
+     */
+    public static String resolveShaBeforeCommitNumber(Git git, int startCommitNumber) throws GitAPIException {
+        if (startCommitNumber <= 1) {
+            return null;
+        }
+        List<String> chronological = getChronologicalCommitShas(git);
+        int lastCompletedOneBased = startCommitNumber - 1;
+        int index = lastCompletedOneBased - 1;
+        if (index >= chronological.size()) {
+            throw new IllegalArgumentException(
+                    "startCommitNumber " + startCommitNumber
+                            + " exceeds repository history (" + chronological.size() + " commits)");
+        }
+        String sha = chronological.get(index);
+        int remaining = chronological.size() - lastCompletedOneBased;
+        System.out.println("[Utils] Resume at commit #" + startCommitNumber
+                + ": exclusive bound " + sha + " (after commit #" + lastCompletedOneBased + ")");
+        System.out.println("[Utils] Commits left to process (through HEAD): " + remaining);
+        return sha;
+    }
 
     /**
      * Gets all commit ids for a specific git repo.

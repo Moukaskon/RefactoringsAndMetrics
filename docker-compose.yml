@@ -9,10 +9,8 @@ services:
       - ./CSVs:/app/CSVs
     # Full run (fresh start):
 #    command: ["https://github.com/apache/commons-lang"]
-    # Resume from a specific commit (SHA + commit-number offset):
-    command: ["https://github.com/apache/commons-lang",
-               "184c9e83211a0552698a934d45d3ebca2c789881",
-               "1123"]
+    # Resume from commit #1381 (SHA resolved automatically from full history):
+    command: ["https://github.com/apache/commons-io", "1381"]
 
   # ── Clone B: Python beauty worker ────────────────────────────────────────────
   beauty-worker:
@@ -23,12 +21,12 @@ services:
     # Override the Java entrypoint — run beauty_worker.py directly
     entrypoint: ["python3", "/app/aesthetics/beauty_worker.py"]
     command:
-      - "--watch-dir=/app/XLSXs/commons-lang"
-      - "--clone-b=/app/Allprojects-beauty/commons-lang"
-      - "--git-url=https://github.com/apache/commons-lang"
+      - "--watch-dir=/app/XLSXs/commons-io"
+      - "--clone-b=/app/Allprojects-beauty/commons-io"
+      - "--git-url=https://github.com/apache/commons-io"
       - "--workers=8"
       - "--poll=2"
       # Resume: skip batches already processed (match Java's startingCommitNumber):
-      - "--start-from-commit=1123"
+      - "--start-from-commit=1381"
     depends_on:
       - refactoring-analyzer

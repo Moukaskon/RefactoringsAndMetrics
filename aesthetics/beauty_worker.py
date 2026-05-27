@@ -17,12 +17,12 @@ Usage
         --clone-b    /path/to/Allprojects/<project>_beauty  \\
         --workers    8
 
-    # Resume – skip batches whose batchStart < 500 (already collected)
+    # Resume – skip batches whose batchStart < 1381 (match Java: java -jar app.jar <url> 1381)
     python beauty_worker.py \\
         --watch-dir  /path/to/XLSXs/<project>   \\
         --clone-b    /path/to/Allprojects/<project>_beauty  \\
         --workers    8                                       \\
-        --start-from-commit 500
+        --start-from-commit 1381
 
 Arguments
 ---------
